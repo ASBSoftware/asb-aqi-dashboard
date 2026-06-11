@@ -1,5 +1,8 @@
 let allSensors = [];
 
+const API_BASE =
+    "https://asb-aqi-api.onrender.com";
+
 let iaqChart;
 let tempChart;
 let humidityChart;
@@ -41,8 +44,8 @@ async function loadDashboard() {
 
         const response =
             await fetch(
-                "http://127.0.0.1:8080/api/sensors"
-            );
+    `${API_BASE}/api/sensors`
+);
 
         allSensors =
             await response.json();
@@ -81,8 +84,8 @@ async function loadHistory(){
 
         const response =
             await fetch(
-                `http://127.0.0.1:8080/api/history?days=${days}`
-            );
+    `${API_BASE}/api/history?days=${days}`
+);
 
         const history =
             await response.json();
