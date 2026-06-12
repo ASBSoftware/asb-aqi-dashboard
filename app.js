@@ -1144,6 +1144,8 @@ document.addEventListener(
             "mores@asbindia.org",
             "sandbhorp@asbindia.org",
             "software@asbindia.org",
+            "swinehartj@asbindia.org",
+            "richardsp@asbindia.org",
             "shindea@asbindia.org"
 
         ];
