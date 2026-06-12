@@ -1054,3 +1054,170 @@ select:focus{
     }
 
 }
+
+/* ==========================
+   MOBILE OPTIMIZATION
+========================== */
+
+@media screen and (max-width: 768px){
+
+    .container{
+        padding:12px;
+    }
+
+    /* HEADER */
+
+    header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:15px;
+        padding:20px;
+    }
+
+    header h1{
+        font-size:30px;
+        line-height:1.2;
+    }
+
+    .header-controls{
+        width:100%;
+        flex-direction:column;
+    }
+
+    .header-controls input,
+    .header-controls select{
+        width:100%;
+    }
+
+    /* STATUS */
+
+    .status-bar{
+        grid-template-columns:1fr;
+    }
+
+    /* HERO */
+
+    .hero{
+        grid-template-columns:1fr;
+    }
+
+    .hero-card{
+        padding:20px;
+    }
+
+    .hero-card h1{
+        font-size:52px;
+    }
+
+    /* KPI */
+
+    .metrics{
+        grid-template-columns:1fr 1fr;
+        gap:12px;
+    }
+
+    .metric-card{
+        padding:16px;
+    }
+
+    .metric-card h2{
+        font-size:24px;
+    }
+
+    /* TOP ROOMS */
+
+    .room-section{
+        grid-template-columns:1fr;
+    }
+
+    /* FLOORS */
+
+    .floor-grid{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .floor-card .score{
+        font-size:30px;
+    }
+
+    /* ALERTS */
+
+    .alert-grid{
+        grid-template-columns:1fr;
+    }
+
+    .alert-group{
+        max-height:none;
+    }
+
+    /* CHARTS */
+
+    .chart-grid{
+        grid-template-columns:1fr;
+    }
+
+    .chart-card{
+        padding:15px;
+    }
+
+    .chart-card canvas{
+        height:250px !important;
+    }
+
+    #historyChart{
+        height:300px !important;
+    }
+
+    /* SENSOR CARDS */
+
+    .sensor-grid{
+        grid-template-columns:1fr;
+    }
+
+    .sensor-card{
+        padding:18px;
+    }
+
+    .sensor-score{
+        font-size:36px;
+    }
+
+    .sensor-metrics{
+        grid-template-columns:1fr 1fr;
+    }
+}
+
+
+/* EXTRA SMALL PHONES */
+
+@media screen and (max-width: 480px){
+
+    header h1{
+        font-size:24px;
+    }
+
+    .hero-card h1{
+        font-size:42px;
+    }
+
+    .metrics{
+        grid-template-columns:1fr;
+    }
+
+    .floor-grid{
+        grid-template-columns:1fr;
+    }
+
+    .sensor-metrics{
+        grid-template-columns:1fr;
+    }
+
+    .alert-group h3{
+        font-size:16px;
+    }
+
+    .alert-row{
+        font-size:13px;
+    }
+
+}
