@@ -1,3 +1,9 @@
+html{
+
+    scroll-behavior:smooth;
+
+}
+
 *{
     margin:0;
     padding:0;
@@ -116,19 +122,6 @@ body{
 
     padding:30px;
 
-}
-
-.history-section{
-
-    background:white;
-
-    border-radius:24px;
-
-    padding:25px;
-
-    margin-bottom:25px;
-
-    box-shadow:var(--shadow);
 }
 
 .history-section{
@@ -304,7 +297,7 @@ select:focus{
 
     display:grid;
 
-    grid-template-columns:2fr 1fr;
+    grid-template-columns:2fr 1fr 1fr 1fr;
 
     gap:20px;
 
@@ -312,19 +305,6 @@ select:focus{
 
 }
 
-.hero-card{
-
-    background:white;
-
-    border:1px solid var(--border);
-
-    border-radius:20px;
-
-    padding:30px;
-
-    box-shadow:var(--shadow);
-
-}
 
 .hero-card span{
 
@@ -402,6 +382,8 @@ select:focus{
 
     border-radius:24px;
 
+     min-height:220px;
+    
     border:none;
 
     box-shadow:var(--shadow);
@@ -429,6 +411,51 @@ select:focus{
 .hero-card:first-child h3{
 
     color:white;
+}
+
+.hero-card:nth-child(2){
+
+    background:linear-gradient(135deg,#1565C0,#1976D2);
+
+    color:white;
+
+}
+
+.hero-card:nth-child(2) span,
+.hero-card:nth-child(2) h3{
+
+    color:rgba(255,255,255,.85);
+
+}
+
+.hero-card:nth-child(3){
+
+    background:linear-gradient(135deg,#E67E22,#F39C12);
+
+    color:white;
+
+}
+
+.hero-card:nth-child(3) span,
+.hero-card:nth-child(3) h3{
+
+    color:rgba(255,255,255,.85);
+
+}
+
+.hero-card:nth-child(4){
+
+    background:#374151;
+
+    color:white;
+
+}
+
+.hero-card:nth-child(4) span,
+.hero-card:nth-child(4) h3{
+
+    color:rgba(255,255,255,.85);
+
 }
 .metric-card:hover{
 
@@ -851,9 +878,32 @@ select:focus{
 }
 
 
+.sensor-card{
+
+    transition:.25s ease;
+
+}
+
 .sensor-card:hover{
 
+    transform:translateY(-6px);
+
+    box-shadow:0 18px 36px rgba(0,0,0,.12);
+
+}
+
+
+.floor-card{
+
+    transition:.25s ease;
+
+}
+
+.floor-card:hover{
+
     transform:translateY(-4px);
+
+    box-shadow:0 12px 30px rgba(0,0,0,.12);
 
 }
 
@@ -1015,7 +1065,17 @@ select:focus{
 
 @media(max-width:1200px){
 
-    .chart-grid{
+    .hero{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .hero{
 
         grid-template-columns:1fr;
 
@@ -1160,9 +1220,21 @@ select:focus{
         padding:15px;
     }
 
-    .chart-card canvas{
-        height:250px !important;
-    }
+.chart-card{
+
+    position:relative;
+
+    min-height:350px;
+
+}
+
+.chart-card canvas{
+
+    width:100% !important;
+
+    height:100% !important;
+
+}
 
     #historyChart{
         height:300px !important;
