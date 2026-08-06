@@ -133,36 +133,18 @@ async function loadHistory(){
 );
 
         console.log("History:", history);
+       
+        const iaqHistory = history.filter(
+    h => h.metric === "indoorAirQuality"
+);
 
-        const iaqHistory =
-            history.filter(
-                h =>
-                h.metric ===
-                "indoorAirQuality"
-            );
-
-        console.log(
-            "IAQ History:",
-            iaqHistory
-        );
-
-       const sampled =
-    history.filter(
-        (_, index) =>
-        index % 100 === 0
-    );
-
-const labels =
-    sampled.map(
-        h =>
-        new Date(
-            h.timestamp
-        ).toLocaleTimeString()
-    );
+const labels = iaqHistory.map(
+    h => new Date(h.timestamp).toLocaleTimeString()
+);
 
 const iaqData =
-    sampled.map(
-        h => h.iaq
+    iaqHistory.map(
+        h=>h.value
     );
 
         if(historyChart)
@@ -300,25 +282,44 @@ function getAlertLevel(value, limit){
    DASHBOARD
 =========================== */
 
+function normalizeRoom(name){
+
+    return name
+        .toLowerCase()
+        .replace(/\./g,"")
+        .replace(/\s+/g," ")
+        .trim();
+
+}
+
 function calculateAverageAQI(roomList, sensors){
 
     const matched = sensors.filter(sensor =>
+
         roomList.some(room =>
-            room.toLowerCase().trim() ===
-            sensor.name.toLowerCase().trim()
+
+            normalizeRoom(room) ===
+            normalizeRoom(sensor.name)
+
         )
+
     );
 
     if(matched.length === 0){
+
         return "--";
+
     }
 
     const total = matched.reduce(
-        (sum, sensor) => sum + (sensor.iaq || 0),
+
+        (sum,sensor)=>sum+(sensor.iaq||0),
+
         0
+
     );
 
-    return Math.round(total / matched.length);
+    return Math.round(total/matched.length);
 
 }
 
@@ -652,6 +653,12 @@ const secondaryAverage =
     ).innerText =
         avgIAQ;
 
+    document.getElementById("escAverage").innerText =
+    escAverage;
+
+document.getElementById("secondaryAverage").innerText =
+    secondaryAverage;
+
     document.getElementById(
         "sensorCount"
     ).innerText =
@@ -710,10 +717,6 @@ const secondaryAverage =
         ? "Good"
         : "Needs Attention";
 
-
-        poorAirAlerts.sort(
-    (a,b) => b.value - a.value
-);
 
 tempAlerts.sort(
     (a,b) => b.value - a.value
