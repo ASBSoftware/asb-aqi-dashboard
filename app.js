@@ -9,6 +9,42 @@ let humidityChart;
 let noiseChart;
 let historyChart;
 
+const ESC_ROOMS = [
+
+"Ground Floor Pre-k Class",
+"1st Floor Art Class",
+"1st Floor KG Class",
+"2nd Floor Grade 1",
+"2nd Floor Grade 2",
+"3rd Floor Music Class",
+"3rd Floor Art Class",
+"4th Floor Grade 3",
+"4th Floor MPH",
+"4th F. Tech Office",
+"5th Floor Grade 4",
+"5th Floor Grade 5",
+"6th Floor MPH",
+"6th Floor OCC"
+
+];
+
+const SECONDARY_ROOMS = [
+
+"4th floor 401",
+"4th floor 402",
+"3rd floor 301",
+"3rd floor 302",
+"3rd floor band room",
+"3rd floor choir room",
+"2nd floor 201",
+"upper icommons",
+"1st floor mph",
+"ground floor G17",
+"ground floor G3",
+"Mph boys washroom",
+"3rd floor boys washroom"
+
+];
 /* ===========================
    CLOCK
 =========================== */
