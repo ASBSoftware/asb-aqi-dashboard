@@ -872,17 +872,12 @@ select:focus{
 
     padding:24px;
 
-    transition:.2s;
-   
     border-top:4px solid #00573F;
-}
-
-
-.sensor-card{
 
     transition:.25s ease;
 
 }
+
 
 .sensor-card:hover{
 
