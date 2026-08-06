@@ -300,6 +300,28 @@ function getAlertLevel(value, limit){
    DASHBOARD
 =========================== */
 
+function calculateAverageAQI(roomList, sensors){
+
+    const matched = sensors.filter(sensor =>
+        roomList.some(room =>
+            room.toLowerCase().trim() ===
+            sensor.name.toLowerCase().trim()
+        )
+    );
+
+    if(matched.length === 0){
+        return "--";
+    }
+
+    const total = matched.reduce(
+        (sum, sensor) => sum + (sensor.iaq || 0),
+        0
+    );
+
+    return Math.round(total / matched.length);
+
+}
+
 function buildDashboard(
     sensors
 ){
@@ -613,6 +635,17 @@ if(co2Level){
         Math.round(
             totalIAQ / count
         );
+    const escAverage =
+    calculateAverageAQI(
+        ESC_ROOMS,
+        sensors
+    );
+
+const secondaryAverage =
+    calculateAverageAQI(
+        SECONDARY_ROOMS,
+        sensors
+    );
 
     document.getElementById(
         "overallIAQ"
