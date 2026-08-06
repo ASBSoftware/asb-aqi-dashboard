@@ -297,7 +297,7 @@ select:focus{
 
     display:grid;
 
-    grid-template-columns:2fr 1fr 1fr 1fr;
+    grid-template-columns:repeat(4,1fr);
 
     gap:20px;
 
@@ -314,9 +314,11 @@ select:focus{
 
 .hero-card h1{
 
-    font-size:78px;
+    font-size:54px;
 
     margin-top:10px;
+
+    line-height:1;
 
 }
 
