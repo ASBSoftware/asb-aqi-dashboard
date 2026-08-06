@@ -282,44 +282,44 @@ function getAlertLevel(value, limit){
    DASHBOARD
 =========================== */
 
-function normalizeRoom(name){
+function normalizeRoom(name) {
 
     return name
         .toLowerCase()
-        .replace(/\./g,"")
-        .replace(/\s+/g," ")
+        .replace(/\./g, "")
+        .replace(/-/g, " ")
+        .replace(/\s+/g, " ")
         .trim();
 
 }
 
-function calculateAverageAQI(roomList, sensors){
+function calculateAverageAQI(roomList, sensors) {
 
-    const matched = sensors.filter(sensor =>
+    let totalAQI = 0;
+    let count = 0;
 
-        roomList.some(room =>
+    roomList.forEach(room => {
 
-            normalizeRoom(room) ===
-            normalizeRoom(sensor.name)
+        const sensor = sensors.find(s =>
+            normalizeRoom(s.name) === normalizeRoom(room)
+        );
 
-        )
+        if (sensor && sensor.iaq != null) {
 
-    );
+            totalAQI += Number(sensor.iaq);
+            count++;
 
-    if(matched.length === 0){
+        } else {
 
-        return "--";
+            console.warn("Room not found:", room);
 
-    }
+        }
 
-    const total = matched.reduce(
+    });
 
-        (sum,sensor)=>sum+(sensor.iaq||0),
+    if (count === 0) return "--";
 
-        0
-
-    );
-
-    return Math.round(total/matched.length);
+    return Math.round(totalAQI / count);
 
 }
 
