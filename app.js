@@ -30,19 +30,14 @@ const ESC_ROOMS = [
 
 const SECONDARY_ROOMS = [
 
-"4th floor 401",
-"4th floor 402",
-"3rd floor 301",
-"3rd floor 302",
-"3rd floor band room",
-"3rd floor choir room",
-"2nd floor 201",
-"upper icommons",
-"1st floor mph",
-"ground floor G17",
-"ground floor G3",
-"Mph boys washroom",
-"3rd floor boys washroom"
+    "401",
+    "402",
+    "301",
+    "302",
+    "Band Room",
+    "Choir Room",
+    "201",
+    "MPH"
 
 ];
 /* ===========================
