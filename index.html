@@ -65,13 +65,20 @@ ASB Environmental Intelligence Dashboard
 
         <div class="header-controls">
 
-            <input
-                type="text"
-                id="searchBox"
-                placeholder="Search sensor..."
-            >
+    <input
+        type="text"
+        id="searchBox"
+        placeholder="Search sensor..."
+    >
 
-            <select id="campusSelect">
+    <button
+        id="aqiCompareBtn"
+        onclick="window.location.href='aqi-compare.html'"
+    >
+        📊 AQI Comparison
+    </button>
+
+    <select id="campusSelect">
 
                 <option value="all">
                     All Campuses
