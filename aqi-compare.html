@@ -11,10 +11,14 @@
 >
 
 <title>
-ASB AQI Comparison
+ASB Campus AQI
 </title>
 
 <style>
+
+/* =====================================================
+   RESET
+===================================================== */
 
 *{
     margin:0;
@@ -22,13 +26,18 @@ ASB AQI Comparison
     box-sizing:border-box;
 }
 
+
+/* =====================================================
+   VARIABLES
+===================================================== */
+
 :root{
 
     --bg:#eef3f8;
 
     --card:#ffffff;
 
-    --text:#1b2733;
+    --text:#1f2937;
 
     --muted:#718096;
 
@@ -42,14 +51,19 @@ ASB AQI Comparison
 
     --red:#e3262e;
 
-    --dark-red:#b91c1c;
+    --purple:#8e44ad;
 
-    --blue:#2563eb;
+    --maroon:#7e0023;
 
     --shadow:
         0 10px 30px rgba(0,0,0,.08);
 
 }
+
+
+/* =====================================================
+   BODY
+===================================================== */
 
 body{
 
@@ -66,6 +80,10 @@ body{
 
 }
 
+
+/* =====================================================
+   HEADER
+===================================================== */
 
 .top-header{
 
@@ -106,9 +124,19 @@ body{
 
     border-radius:8px;
 
-    object-fit:cover;
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
 
     background:#172554;
+
+    color:white;
+
+    font-size:11px;
+
+    font-weight:700;
 
 }
 
@@ -184,11 +212,17 @@ body{
 
 }
 
+
 .back-btn:hover{
 
     background:#e5e7eb;
 
 }
+
+
+/* =====================================================
+   PAGE
+===================================================== */
 
 .page{
 
@@ -232,6 +266,10 @@ body{
 }
 
 
+/* =====================================================
+   CAMPUS GRID
+===================================================== */
+
 .campus-grid{
 
     display:grid;
@@ -243,11 +281,15 @@ body{
 }
 
 
+/* =====================================================
+   AQI CARD
+===================================================== */
+
 .aqi-card{
 
     position:relative;
 
-    min-height:360px;
+    min-height:390px;
 
     border-radius:24px;
 
@@ -259,10 +301,6 @@ body{
 
     box-shadow:var(--shadow);
 
-    display:flex;
-
-    flex-direction:column;
-
 }
 
 
@@ -271,8 +309,8 @@ body{
     background:
         linear-gradient(
             135deg,
-            #42a94f,
-            #2c9a3d
+            #42aa4f,
+            #2e9a3e
         );
 
 }
@@ -285,18 +323,6 @@ body{
             135deg,
             #238f3b,
             #16752d
-        );
-
-}
-
-
-.aqi-card.outdoor{
-
-    background:
-        linear-gradient(
-            135deg,
-            #e62c32,
-            #c91f25
         );
 
 }
@@ -341,86 +367,59 @@ body{
 }
 
 
-/* =========================
+/* =====================================================
    GAUGE
-========================= */
+===================================================== */
 
-.gauge{
+.gauge-wrapper{
 
-    width:190px;
+    width:250px;
 
-    height:100px;
+    height:155px;
 
-    margin:30px auto 10px;
+    margin:20px auto 0;
 
     position:relative;
 
-    overflow:hidden;
+}
+
+
+.gauge-svg{
+
+    width:250px;
+
+    height:155px;
+
+    overflow:visible;
 
 }
 
 
-.gauge::before{
+.gauge-background{
 
-    content:"";
+    fill:none;
 
-    position:absolute;
+    stroke:rgba(255,255,255,.22);
 
-    width:190px;
+    stroke-width:14;
 
-    height:190px;
-
-    border-radius:50%;
-
-    border:12px solid rgba(255,255,255,.18);
-
-    border-bottom-color:transparent;
-
-    transform:rotate(-45deg);
+    stroke-linecap:round;
 
 }
 
 
-.gauge-fill{
+.gauge-progress{
 
-    position:absolute;
+    fill:none;
 
-    width:190px;
+    stroke:white;
 
-    height:190px;
+    stroke-width:14;
 
-    border-radius:50%;
+    stroke-linecap:round;
 
-    border:12px solid transparent;
-
-    border-top-color:white;
-
-    border-left-color:white;
-
-    transform:rotate(-45deg);
-
-    transition:transform .8s ease;
-
-}
-
-
-.gauge-center{
-
-    position:absolute;
-
-    left:50%;
-
-    bottom:0;
-
-    transform:translateX(-50%);
-
-    width:8px;
-
-    height:8px;
-
-    border-radius:50%;
-
-    background:white;
+    transition:
+        stroke-dashoffset .8s ease;
 
 }
 
@@ -429,19 +428,22 @@ body{
 
     position:absolute;
 
-    width:80px;
+    width:95px;
 
-    height:2px;
+    height:3px;
 
     background:white;
 
     left:50%;
 
-    bottom:3px;
+    top:124px;
 
-    transform-origin:left center;
+    transform-origin:0 50%;
 
-    transition:transform .8s ease;
+    transition:
+        transform .8s ease;
+
+    border-radius:5px;
 
 }
 
@@ -452,19 +454,45 @@ body{
 
     position:absolute;
 
-    right:-4px;
+    right:-5px;
 
-    top:-3px;
+    top:-4px;
 
-    width:8px;
+    width:10px;
 
-    height:8px;
+    height:10px;
 
     background:white;
 
     border-radius:50%;
 
 }
+
+
+.gauge-center{
+
+    position:absolute;
+
+    left:50%;
+
+    top:120px;
+
+    width:10px;
+
+    height:10px;
+
+    background:white;
+
+    border-radius:50%;
+
+    transform:translateX(-50%);
+
+}
+
+
+/* =====================================================
+   AQI VALUE
+===================================================== */
 
 .aqi-value{
 
@@ -475,6 +503,8 @@ body{
     font-weight:800;
 
     line-height:1;
+
+    margin-top:-2px;
 
 }
 
@@ -507,11 +537,11 @@ body{
 
 .status-pill{
 
-    align-self:center;
+    width:max-content;
 
-    margin-top:8px;
+    margin:8px auto 0;
 
-    padding:8px 20px;
+    padding:8px 22px;
 
     border-radius:30px;
 
@@ -522,6 +552,24 @@ body{
     font-size:15px;
 
 }
+
+
+.sensor-count{
+
+    text-align:center;
+
+    margin-top:12px;
+
+    font-size:12px;
+
+    opacity:.8;
+
+}
+
+
+/* =====================================================
+   INFO BAR
+===================================================== */
 
 .info-bar{
 
@@ -586,6 +634,10 @@ body{
 
 }
 
+
+/* =====================================================
+   DETAILS
+===================================================== */
 
 .details-grid{
 
@@ -653,6 +705,10 @@ body{
 }
 
 
+/* =====================================================
+   AMERICAN AQI SCALE
+===================================================== */
+
 .scale{
 
     margin-top:25px;
@@ -684,19 +740,23 @@ body{
     border-radius:20px;
 
     background:
-
         linear-gradient(
             to right,
             #35a64a 0%,
             #35a64a 10%,
+
             #f9c23c 10%,
             #f9c23c 20%,
+
             #f28c28 20%,
             #f28c28 30%,
+
             #e3262e 30%,
             #e3262e 40%,
+
             #8e44ad 40%,
             #8e44ad 60%,
+
             #7e0023 60%,
             #7e0023 100%
         );
@@ -727,6 +787,10 @@ body{
 }
 
 
+/* =====================================================
+   FOOTER
+===================================================== */
+
 .footer{
 
     text-align:center;
@@ -746,7 +810,14 @@ body{
 
 }
 
+
+/* =====================================================
+   LOADING
+===================================================== */
+
 .loading{
+
+    grid-column:1 / -1;
 
     text-align:center;
 
@@ -757,19 +828,30 @@ body{
 }
 
 
+/* =====================================================
+   ERROR
+===================================================== */
+
 .error{
+
+    grid-column:1 / -1;
 
     text-align:center;
 
     padding:40px;
 
-    background:#fff;
+    background:white;
 
     border-radius:18px;
 
     color:#b91c1c;
 
 }
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
 
 @media(max-width:768px){
 
@@ -831,7 +913,7 @@ body{
 
     .aqi-card{
 
-        min-height:330px;
+        min-height:370px;
 
     }
 
@@ -885,6 +967,11 @@ body{
 
 <body>
 
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
 <header class="top-header">
 
     <div class="brand">
@@ -900,7 +987,7 @@ body{
             </h1>
 
             <p>
-                Environmental Intelligence — AQI Comparison
+                Environmental Intelligence — Campus AQI
             </p>
 
         </div>
@@ -932,23 +1019,30 @@ body{
 
 </header>
 
+
+<!-- =====================================================
+     MAIN PAGE
+===================================================== -->
+
 <main class="page">
 
 
     <div class="page-title">
 
         <h2>
-            Indoor Air Quality
+            Campus Air Quality
         </h2>
 
         <p>
-            American School of Bombay — Campus AQI
+            American School of Bombay — American AQI Scale
         </p>
 
     </div>
 
 
-    <!-- CAMPUS CARDS -->
+    <!-- =================================================
+         CAMPUS CARDS
+    ================================================= -->
 
     <div
         class="campus-grid"
@@ -962,7 +1056,9 @@ body{
     </div>
 
 
-    <!-- INFO -->
+    <!-- =================================================
+         INFO
+    ================================================= -->
 
     <div
         class="info-bar"
@@ -976,11 +1072,11 @@ body{
         <div class="info-text">
 
             <strong id="infoTitle">
-                Calculating indoor air quality...
+                Calculating campus AQI...
             </strong>
 
             <span id="infoText">
-                Please wait while the sensor readings are loaded.
+                Loading all campus sensor readings.
             </span>
 
         </div>
@@ -988,7 +1084,9 @@ body{
     </div>
 
 
-    <!-- ROOM DETAILS -->
+    <!-- =================================================
+         SENSOR DETAILS
+    ================================================= -->
 
     <div
         class="details-grid"
@@ -997,7 +1095,9 @@ body{
     </div>
 
 
-    <!-- AQI SCALE -->
+    <!-- =================================================
+         AQI SCALE
+    ================================================= -->
 
     <div class="scale">
 
@@ -1021,7 +1121,8 @@ body{
 
             <div>
                 101–150<br>
-                Unhealthy<br>for Sensitive
+                Unhealthy<br>
+                for Sensitive
             </div>
 
             <div>
@@ -1044,6 +1145,10 @@ body{
     </div>
 
 
+    <!-- =================================================
+         FOOTER
+    ================================================= -->
+
     <div class="footer">
 
         <strong>
@@ -1065,26 +1170,28 @@ body{
 
 <script type="module">
 
-/* =========================
-   FIREBASE AUTH
-========================= */
+/* =====================================================
+   FIREBASE
+===================================================== */
 
 import {
     initializeApp
-} from
+}
+from
 "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
 
 
 import {
     getAuth,
     onAuthStateChanged
-} from
+}
+from
 "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
 
-/* =========================
+/* =====================================================
    FIREBASE CONFIG
-========================= */
+===================================================== */
 
 const firebaseConfig = {
 
@@ -1120,717 +1227,29 @@ const auth =
     getAuth(firebaseApp);
 
 
-/* =========================
+/* =====================================================
    API
-========================= */
+===================================================== */
 
 const API_BASE =
     "https://asb-aqi-api.onrender.com";
 
 
-/* =========================
-   ROOM LISTS
-========================= */
+/* =====================================================
+   CAMPUS NAMES
+===================================================== */
 
-const ESC_ROOMS = [
+const ESC_CAMPUS =
+    "Elementary Campus - Kurla";
 
-    "Ground Floor Pre-k Class",
 
-    "1st Floor Art Class",
+const SSC_CAMPUS =
+    "Secondary Campus - BKC";
 
-    "1st Floor KG Class",
 
-    "2nd Floor Grade 1",
-
-    "2nd Floor Grade 2",
-
-    "3rd Floor Music Class",
-
-    "3rd Floor Art Class",
-
-    "4th Floor Grade 3",
-
-    "4th Floor MPH",
-
-    "4th F. Tech Office",
-
-    "5th Floor Grade 4",
-
-    "5th Floor Grade 5",
-
-    "6th Floor MPH",
-
-    "6th Floor OCC"
-
-];
-
-
-const SSC_ROOMS = [
-
-    "401",
-
-    "402",
-
-    "301",
-
-    "302",
-
-    "Band Room",
-
-    "Choir Room",
-
-    "201",
-
-    "MPH"
-
-];
-
-
-/* =========================
-   NORMALIZE ROOM NAMES
-========================= */
-
-function normalizeRoom(name){
-
-    return String(name || "")
-
-        .toLowerCase()
-
-        .replace(/\./g,"")
-
-        .replace(/\s+/g," ")
-
-        .trim();
-
-}
-
-
-/* =========================
-   FIND ROOM
-========================= */
-
-function roomMatches(sensorName, roomName){
-
-    const sensor =
-        normalizeRoom(sensorName);
-
-    const room =
-        normalizeRoom(roomName);
-
-
-    if(sensor === room)
-        return true;
-
-
-    /*
-       Allows:
-
-       "4th floor 401"
-       "401"
-
-       "3rd floor band room"
-       "Band Room"
-
-       etc.
-    */
-
-    if(
-        sensor.endsWith(" " + room) ||
-        sensor === room
-    ){
-
-        return true;
-
-    }
-
-
-    return false;
-
-}
-
-
-/* =========================
-   CALCULATE AVERAGE
-========================= */
-
-function calculateAverage(
-    rooms,
-    sensors
-){
-
-    const matched =
-        sensors.filter(sensor =>
-
-            rooms.some(room =>
-
-                roomMatches(
-                    sensor.name,
-                    room
-                )
-
-            )
-
-        );
-
-
-    if(!matched.length){
-
-        return {
-
-            average:null,
-
-            sensors:[]
-
-        };
-
-    }
-
-
-    const valid =
-        matched.filter(sensor =>
-
-            Number.isFinite(
-                Number(sensor.iaq)
-            )
-
-        );
-
-
-    if(!valid.length){
-
-        return {
-
-            average:null,
-
-            sensors:matched
-
-        };
-
-    }
-
-
-    const total =
-        valid.reduce(
-
-            (sum,sensor) =>
-
-                sum +
-                Number(sensor.iaq),
-
-            0
-
-        );
-
-
-    return {
-
-        average:
-            Math.round(
-                total / valid.length
-            ),
-
-        sensors:valid
-
-    };
-
-}
-
-
-/* =========================
-   AMERICAN AQI STATUS
-========================= */
-
-function getAQIStatus(aqi){
-
-    if(aqi === null)
-        return {
-
-            text:"No Data",
-
-            className:""
-
-        };
-
-
-    if(aqi <= 50)
-        return {
-
-            text:"Good",
-
-            className:"good"
-
-        };
-
-
-    if(aqi <= 100)
-        return {
-
-            text:"Moderate",
-
-            className:"moderate"
-
-        };
-
-
-    if(aqi <= 150)
-        return {
-
-            text:
-                "Unhealthy for Sensitive Groups",
-
-            className:"sensitive"
-
-        };
-
-
-    if(aqi <= 200)
-        return {
-
-            text:"Unhealthy",
-
-            className:"unhealthy"
-
-        };
-
-
-    if(aqi <= 300)
-        return {
-
-            text:"Very Unhealthy",
-
-            className:"very-unhealthy"
-
-        };
-
-
-    return {
-
-        text:"Hazardous",
-
-        className:"hazardous"
-
-    };
-
-}
-
-
-/* =========================
-   GAUGE
-========================= */
-
-function gaugeRotation(aqi){
-
-    if(aqi === null)
-        return -45;
-
-
-    const limited =
-        Math.min(
-            Math.max(aqi,0),
-            500
-        );
-
-
-    /*
-       Convert 0–500 into
-       roughly -45° to +135°
-    */
-
-    return -45 +
-        (limited / 500) * 180;
-
-}
-
-
-/* =========================
-   CREATE CAMPUS CARD
-========================= */
-
-function createCampusCard(
-    title,
-    average,
-    type
-){
-
-    const status =
-        getAQIStatus(average);
-
-
-    const rotation =
-        gaugeRotation(average);
-
-
-    const card =
-        document.createElement("div");
-
-
-    card.className =
-        `aqi-card ${type}`;
-
-
-    card.innerHTML = `
-
-        <div class="card-top">
-
-            <div class="card-title">
-                ${title}
-            </div>
-
-            <div class="card-tag">
-                INDOOR
-            </div>
-
-        </div>
-
-
-        <div class="gauge">
-
-            <div
-                class="gauge-fill"
-                style="
-                    transform:
-                    rotate(${rotation}deg);
-                "
-            ></div>
-
-            <div
-                class="gauge-needle"
-                style="
-                    transform:
-                    rotate(${rotation}deg);
-                "
-            ></div>
-
-            <div class="gauge-center"></div>
-
-        </div>
-
-
-        <div class="aqi-value">
-            ${average ?? "--"}
-        </div>
-
-
-        <div class="aqi-label">
-            AQI
-        </div>
-
-
-        <div class="air-quality-text">
-            Air Quality is
-        </div>
-
-
-        <div class="status-pill">
-            ${status.text}
-        </div>
-
-    `;
-
-
-    return card;
-
-}
-
-
-/* =========================
-   ROOM DETAILS
-========================= */
-
-function createRoomDetails(
-    title,
-    sensors
-){
-
-    const card =
-        document.createElement("div");
-
-
-    card.className =
-        "detail-card";
-
-
-    const rows =
-        sensors
-            .sort(
-                (a,b) =>
-                    Number(a.iaq) -
-                    Number(b.iaq)
-            )
-            .map(sensor => `
-
-                <div class="room-row">
-
-                    <span>
-                        ${sensor.name}
-                    </span>
-
-                    <span class="room-value">
-                        ${sensor.iaq}
-                    </span>
-
-                </div>
-
-            `)
-            .join("");
-
-
-    card.innerHTML = `
-
-        <h3>
-            ${title} Sensors
-        </h3>
-
-        ${rows || `
-            <div class="room-row">
-                <span>
-                    No matching sensors found
-                </span>
-            </div>
-        `}
-
-    `;
-
-
-    return card;
-
-}
-
-
-/* =========================
-   UPDATE INFO
-========================= */
-
-function updateInfo(
-    escAverage,
-    sscAverage
-){
-
-    const values =
-        [
-            escAverage,
-            sscAverage
-        ]
-        .filter(
-            value =>
-                value !== null
-        );
-
-
-    if(!values.length){
-
-        document.getElementById(
-            "infoTitle"
-        ).innerText =
-            "No AQI data available";
-
-
-        document.getElementById(
-            "infoText"
-        ).innerText =
-            "No matching indoor sensor readings were found.";
-
-        return;
-
-    }
-
-
-    const overall =
-        Math.round(
-
-            values.reduce(
-                (a,b) => a+b,
-                0
-            )
-            /
-            values.length
-
-        );
-
-
-    document.getElementById(
-        "infoTitle"
-    ).innerText =
-        `Indoor average AQI is ${overall}`;
-
-
-    document.getElementById(
-        "infoText"
-    ).innerText =
-        "This value is calculated from the selected ASB indoor sensor readings.";
-
-}
-
-
-/* =========================
-   LOAD DATA
-========================= */
-
-async function loadAQIData(){
-
-    try{
-
-        const response =
-            await fetch(
-                `${API_BASE}/api/sensors`
-            );
-
-
-        if(!response.ok){
-
-            throw new Error(
-                "Unable to load sensor data."
-            );
-
-        }
-
-
-        const sensors =
-            await response.json();
-
-
-        const esc =
-            calculateAverage(
-                ESC_ROOMS,
-                sensors
-            );
-
-
-        const ssc =
-            calculateAverage(
-                SSC_ROOMS,
-                sensors
-            );
-
-
-        const campusGrid =
-            document.getElementById(
-                "campusGrid"
-            );
-
-
-        campusGrid.innerHTML = "";
-
-
-        campusGrid.appendChild(
-
-            createCampusCard(
-                "ESC Average",
-                esc.average,
-                "esc"
-            )
-
-        );
-
-
-        campusGrid.appendChild(
-
-            createCampusCard(
-                "SSC Average",
-                ssc.average,
-                "ssc"
-            )
-
-        );
-
-
-        const detailsGrid =
-            document.getElementById(
-                "detailsGrid"
-            );
-
-
-        detailsGrid.innerHTML = "";
-
-
-        detailsGrid.appendChild(
-
-            createRoomDetails(
-                "ESC",
-                esc.sensors
-            )
-
-        );
-
-
-        detailsGrid.appendChild(
-
-            createRoomDetails(
-                "SSC",
-                ssc.sensors
-            )
-
-        );
-
-
-        updateInfo(
-            esc.average,
-            ssc.average
-        );
-
-
-        const now =
-            new Date();
-
-
-        document.getElementById(
-            "lastUpdated"
-        ).innerText =
-            now.toLocaleString();
-
-
-    }
-    catch(error){
-
-        console.error(error);
-
-
-        document.getElementById(
-            "campusGrid"
-        ).innerHTML = `
-
-            <div class="error">
-
-                Unable to load AQI data.
-
-                <br><br>
-
-                Please try refreshing the page.
-
-            </div>
-
-        `;
-
-    }
-
-}
-
-
-/* =========================
-   CLOCK
-========================= */
-
-function updateClock(){
-
-    document.getElementById(
-        "clock"
-    ).innerText =
-        new Date().toLocaleTimeString();
-
-}
-
-
-setInterval(
-    updateClock,
-    1000
-);
-
-updateClock();
-
-
-/* =========================
-   AUTH
-========================= */
+/* =====================================================
+   ALLOWED USERS
+===================================================== */
 
 const allowedUsers = [
 
@@ -1857,22 +1276,854 @@ const allowedUsers = [
 ];
 
 
+/* =====================================================
+   AMERICAN AQI STATUS
+===================================================== */
+
+function getAQIStatus(aqi){
+
+    if(aqi === null){
+
+        return {
+
+            text:"No Data"
+
+        };
+
+    }
+
+
+    if(aqi <= 50){
+
+        return {
+
+            text:"Good"
+
+        };
+
+    }
+
+
+    if(aqi <= 100){
+
+        return {
+
+            text:"Moderate"
+
+        };
+
+    }
+
+
+    if(aqi <= 150){
+
+        return {
+
+            text:
+                "Unhealthy for Sensitive Groups"
+
+        };
+
+    }
+
+
+    if(aqi <= 200){
+
+        return {
+
+            text:"Unhealthy"
+
+        };
+
+    }
+
+
+    if(aqi <= 300){
+
+        return {
+
+            text:"Very Unhealthy"
+
+        };
+
+    }
+
+
+    return {
+
+        text:"Hazardous"
+
+    };
+
+}
+
+
+/* =====================================================
+   CALCULATE CAMPUS AVERAGE
+===================================================== */
+
+/*
+    IMPORTANT:
+
+    We are NOT using the room list anymore.
+
+    ESC = every sensor where:
+        sensor.network ===
+        "Elementary Campus - Kurla"
+
+    SSC = every sensor where:
+        sensor.network ===
+        "Secondary Campus - BKC"
+*/
+
+function calculateCampusAverage(
+    sensors,
+    campus
+){
+
+    const campusSensors =
+        sensors.filter(
+            sensor =>
+
+                String(sensor.network || "")
+                    .trim()
+                    .toLowerCase()
+                ===
+                campus
+                    .trim()
+                    .toLowerCase()
+        );
+
+
+    const validSensors =
+        campusSensors.filter(
+            sensor => {
+
+                const value =
+                    Number(sensor.iaq);
+
+                return Number.isFinite(value);
+
+            }
+        );
+
+
+    if(!validSensors.length){
+
+        return {
+
+            average:null,
+
+            sensors:campusSensors
+
+        };
+
+    }
+
+
+    const total =
+        validSensors.reduce(
+
+            (sum,sensor) => {
+
+                return sum +
+                    Number(sensor.iaq);
+
+            },
+
+            0
+
+        );
+
+
+    return {
+
+        average:
+            Math.round(
+                total /
+                validSensors.length
+            ),
+
+        sensors:
+            validSensors
+
+    };
+
+}
+
+
+/* =====================================================
+   GAUGE CALCULATION
+===================================================== */
+
+/*
+    American AQI goes from 0 to 500.
+
+    The gauge is a semicircle.
+
+    0 AQI  = -90 degrees
+    250    =   0 degrees
+    500    =  90 degrees
+*/
+
+function getGaugeAngle(aqi){
+
+    if(aqi === null){
+
+        return 0;
+
+    }
+
+
+    const limited =
+        Math.max(
+            0,
+            Math.min(
+                500,
+                aqi
+            )
+        );
+
+
+    return -90 +
+        (
+            limited / 500
+        ) * 180;
+
+}
+
+
+/* =====================================================
+   GAUGE SVG
+===================================================== */
+
+function createGauge(){
+
+    return `
+
+        <div class="gauge-wrapper">
+
+            <svg
+                class="gauge-svg"
+                viewBox="0 0 250 155"
+            >
+
+                <!-- BACKGROUND -->
+
+                <path
+                    class="gauge-background"
+                    d="
+                        M 35 125
+                        A 90 90 0 0 1 215 125
+                    "
+                ></path>
+
+
+                <!-- ACTIVE -->
+
+                <path
+                    class="gauge-progress"
+                    id="gaugeProgress"
+                    d="
+                        M 35 125
+                        A 90 90 0 0 1 215 125
+                    "
+                ></path>
+
+            </svg>
+
+
+            <div
+                class="gauge-needle"
+                id="gaugeNeedle"
+            ></div>
+
+
+            <div
+                class="gauge-center"
+            ></div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =====================================================
+   SET GAUGE
+===================================================== */
+
+function setGauge(
+    card,
+    aqi
+){
+
+    const progress =
+        card.querySelector(
+            ".gauge-progress"
+        );
+
+
+    const needle =
+        card.querySelector(
+            ".gauge-needle"
+        );
+
+
+    if(!progress || !needle)
+        return;
+
+
+    /*
+       Approximate length of the
+       semicircle path.
+    */
+
+    const pathLength = 283;
+
+
+    progress.style.strokeDasharray =
+        pathLength;
+
+
+    let percentage = 0;
+
+
+    if(aqi !== null){
+
+        percentage =
+            Math.max(
+                0,
+                Math.min(
+                    100,
+                    Number(aqi) / 500 * 100
+                )
+            );
+
+    }
+
+
+    /*
+       Move the white arc according
+       to the AQI.
+    */
+
+    progress.style.strokeDashoffset =
+        pathLength -
+        (
+            pathLength *
+            percentage /
+            100
+        );
+
+
+    /*
+       Move the needle.
+
+       Gauge center is approximately
+       x=125, y=125.
+
+       -90° points left.
+       0° points up.
+       +90° points right.
+    */
+
+    const angle =
+        getGaugeAngle(aqi);
+
+
+    needle.style.transform =
+        `rotate(${angle}deg)`;
+
+}
+
+
+/* =====================================================
+   CREATE CAMPUS CARD
+===================================================== */
+
+function createCampusCard(
+    title,
+    result,
+    type
+){
+
+    const card =
+        document.createElement("div");
+
+
+    card.className =
+        `aqi-card ${type}`;
+
+
+    const average =
+        result.average;
+
+
+    const status =
+        getAQIStatus(average);
+
+
+    card.innerHTML = `
+
+        <div class="card-top">
+
+            <div class="card-title">
+                ${title}
+            </div>
+
+            <div class="card-tag">
+                INDOOR
+            </div>
+
+        </div>
+
+
+        ${createGauge()}
+
+
+        <div class="aqi-value">
+
+            ${average ?? "--"}
+
+        </div>
+
+
+        <div class="aqi-label">
+
+            AQI
+
+        </div>
+
+
+        <div class="air-quality-text">
+
+            Air Quality is
+
+        </div>
+
+
+        <div class="status-pill">
+
+            ${status.text}
+
+        </div>
+
+
+        <div class="sensor-count">
+
+            Based on
+            ${result.sensors.length}
+            sensor${result.sensors.length === 1 ? "" : "s"}
+
+        </div>
+
+    `;
+
+
+    /*
+       Set gauge AFTER the HTML
+       has been inserted.
+    */
+
+    setTimeout(
+        () => {
+
+            setGauge(
+                card,
+                average
+            );
+
+        },
+        20
+    );
+
+
+    return card;
+
+}
+
+
+/* =====================================================
+   ROOM / SENSOR DETAILS
+===================================================== */
+
+function createSensorDetails(
+    title,
+    sensors
+){
+
+    const card =
+        document.createElement("div");
+
+
+    card.className =
+        "detail-card";
+
+
+    const sorted =
+        [...sensors].sort(
+            (a,b) =>
+                Number(a.iaq) -
+                Number(b.iaq)
+        );
+
+
+    const rows =
+        sorted.map(
+            sensor => `
+
+                <div class="room-row">
+
+                    <span>
+                        ${sensor.name}
+                    </span>
+
+                    <span class="room-value">
+                        ${sensor.iaq}
+                    </span>
+
+                </div>
+
+            `
+        ).join("");
+
+
+    card.innerHTML = `
+
+        <h3>
+            ${title} Sensors
+        </h3>
+
+        ${
+            rows ||
+            `
+                <div class="room-row">
+
+                    <span>
+                        No sensors found
+                    </span>
+
+                </div>
+            `
+        }
+
+    `;
+
+
+    return card;
+
+}
+
+
+/* =====================================================
+   UPDATE INFO
+===================================================== */
+
+function updateInfo(
+    esc,
+    ssc
+){
+
+    const values = [
+
+        esc.average,
+
+        ssc.average
+
+    ].filter(
+        value =>
+            value !== null
+    );
+
+
+    if(!values.length){
+
+        document.getElementById(
+            "infoTitle"
+        ).innerText =
+            "No campus AQI data available";
+
+
+        document.getElementById(
+            "infoText"
+        ).innerText =
+            "No valid AQI readings were returned from the campus sensors.";
+
+        return;
+
+    }
+
+
+    const overall =
+        Math.round(
+
+            values.reduce(
+                (a,b) =>
+                    a + b,
+
+                0
+            )
+            /
+            values.length
+
+        );
+
+
+    document.getElementById(
+        "infoTitle"
+    ).innerText =
+        `Indoor campus average AQI is ${overall}`;
+
+
+    document.getElementById(
+        "infoText"
+    ).innerText =
+        `ESC and SSC averages are calculated using all active AQI sensors assigned to their respective campus.`;
+
+}
+
+
+/* =====================================================
+   LOAD AQI DATA
+===================================================== */
+
+async function loadAQIData(){
+
+    try{
+
+        const response =
+            await fetch(
+                `${API_BASE}/api/sensors`
+            );
+
+
+        if(!response.ok){
+
+            throw new Error(
+                "Unable to load sensor data."
+            );
+
+        }
+
+
+        const sensors =
+            await response.json();
+
+
+        console.log(
+            "All sensors:",
+            sensors
+        );
+
+
+        /*
+           ESC:
+           ALL sensors belonging to
+           Elementary Campus - Kurla
+        */
+
+        const esc =
+            calculateCampusAverage(
+                sensors,
+                ESC_CAMPUS
+            );
+
+
+        /*
+           SSC:
+           ALL sensors belonging to
+           Secondary Campus - BKC
+        */
+
+        const ssc =
+            calculateCampusAverage(
+                sensors,
+                SSC_CAMPUS
+            );
+
+
+        console.log(
+            "ESC:",
+            esc
+        );
+
+
+        console.log(
+            "SSC:",
+            ssc
+        );
+
+
+        /* =============================================
+           CAMPUS CARDS
+        ============================================= */
+
+        const campusGrid =
+            document.getElementById(
+                "campusGrid"
+            );
+
+
+        campusGrid.innerHTML = "";
+
+
+        campusGrid.appendChild(
+
+            createCampusCard(
+                "ESC Average",
+                esc,
+                "esc"
+            )
+
+        );
+
+
+        campusGrid.appendChild(
+
+            createCampusCard(
+                "SSC Average",
+                ssc,
+                "ssc"
+            )
+
+        );
+
+
+        /* =============================================
+           SENSOR DETAILS
+        ============================================= */
+
+        const detailsGrid =
+            document.getElementById(
+                "detailsGrid"
+            );
+
+
+        detailsGrid.innerHTML = "";
+
+
+        detailsGrid.appendChild(
+
+            createSensorDetails(
+                "ESC",
+                esc.sensors
+            )
+
+        );
+
+
+        detailsGrid.appendChild(
+
+            createSensorDetails(
+                "SSC",
+                ssc.sensors
+            )
+
+        );
+
+
+        /* =============================================
+           INFO
+        ============================================= */
+
+        updateInfo(
+            esc,
+            ssc
+        );
+
+
+        /* =============================================
+           LAST UPDATED
+        ============================================= */
+
+        document.getElementById(
+            "lastUpdated"
+        ).innerText =
+            new Date().toLocaleString();
+
+
+    }
+    catch(error){
+
+        console.error(
+            "AQI ERROR:",
+            error
+        );
+
+
+        document.getElementById(
+            "campusGrid"
+        ).innerHTML = `
+
+            <div class="error">
+
+                Unable to load AQI data.
+
+                <br><br>
+
+                Please refresh the page.
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =====================================================
+   CLOCK
+===================================================== */
+
+function updateClock(){
+
+    document.getElementById(
+        "clock"
+    ).innerText =
+        new Date().toLocaleTimeString();
+
+}
+
+
+updateClock();
+
+
+setInterval(
+    updateClock,
+    1000
+);
+
+
+/* =====================================================
+   AUTH
+===================================================== */
+
 onAuthStateChanged(
+
     auth,
+
     user => {
 
         if(
+
             user &&
+
+            user.email &&
+
             allowedUsers.includes(
                 user.email.toLowerCase()
             )
+
         ){
 
             loadAQIData();
 
+
             /*
-               Refresh sensor readings
-               every 30 seconds.
+               Refresh every 30 seconds.
             */
 
             setInterval(
@@ -1881,6 +2132,7 @@ onAuthStateChanged(
             );
 
         }
+
         else{
 
             document.body.innerHTML = `
@@ -1913,9 +2165,12 @@ onAuthStateChanged(
                             margin-top:10px;
                             color:#64748b;
                         ">
+
                             Please sign in through
                             the ASB dashboard first.
+
                         </p>
+
 
                         <button
                             onclick="
@@ -1931,7 +2186,9 @@ onAuthStateChanged(
                                 cursor:pointer;
                             "
                         >
+
                             Back to Dashboard
+
                         </button>
 
                     </div>
@@ -1943,6 +2200,7 @@ onAuthStateChanged(
         }
 
     }
+
 );
 
 </script>
