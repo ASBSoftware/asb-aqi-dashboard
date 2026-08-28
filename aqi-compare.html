@@ -1,0 +1,1952 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>
+ASB AQI Comparison
+</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+:root{
+
+    --bg:#eef3f8;
+
+    --card:#ffffff;
+
+    --text:#1b2733;
+
+    --muted:#718096;
+
+    --green:#35a64a;
+
+    --green-dark:#218838;
+
+    --yellow:#f9c23c;
+
+    --orange:#f28c28;
+
+    --red:#e3262e;
+
+    --dark-red:#b91c1c;
+
+    --blue:#2563eb;
+
+    --shadow:
+        0 10px 30px rgba(0,0,0,.08);
+
+}
+
+body{
+
+    min-height:100vh;
+
+    background:var(--bg);
+
+    font-family:
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    color:var(--text);
+
+}
+
+
+.top-header{
+
+    height:62px;
+
+    background:white;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:0 22px;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.08);
+
+}
+
+
+.brand{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+
+.logo{
+
+    width:40px;
+
+    height:40px;
+
+    border-radius:8px;
+
+    object-fit:cover;
+
+    background:#172554;
+
+}
+
+
+.brand-text h1{
+
+    font-size:17px;
+
+    line-height:1.1;
+
+    font-weight:700;
+
+}
+
+
+.brand-text p{
+
+    font-size:11px;
+
+    color:#8a96a3;
+
+    margin-top:3px;
+
+}
+
+
+.header-right{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+}
+
+
+.live{
+
+    color:#21a347;
+
+    font-size:12px;
+
+    font-weight:700;
+
+}
+
+
+.clock{
+
+    font-size:13px;
+
+    color:#333;
+
+}
+
+
+.back-btn{
+
+    border:none;
+
+    background:#f4f6f8;
+
+    border-radius:10px;
+
+    padding:9px 14px;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+    color:#334155;
+
+}
+
+.back-btn:hover{
+
+    background:#e5e7eb;
+
+}
+
+.page{
+
+    width:100%;
+
+    max-width:1100px;
+
+    margin:0 auto;
+
+    padding:24px 20px 40px;
+
+}
+
+
+.page-title{
+
+    text-align:center;
+
+    margin-bottom:20px;
+
+}
+
+
+.page-title h2{
+
+    font-size:28px;
+
+    font-weight:700;
+
+}
+
+
+.page-title p{
+
+    color:var(--muted);
+
+    margin-top:5px;
+
+    font-size:14px;
+
+}
+
+
+.campus-grid{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:20px;
+
+}
+
+
+.aqi-card{
+
+    position:relative;
+
+    min-height:360px;
+
+    border-radius:24px;
+
+    padding:25px;
+
+    color:white;
+
+    overflow:hidden;
+
+    box-shadow:var(--shadow);
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+
+.aqi-card.esc{
+
+    background:
+        linear-gradient(
+            135deg,
+            #42a94f,
+            #2c9a3d
+        );
+
+}
+
+
+.aqi-card.ssc{
+
+    background:
+        linear-gradient(
+            135deg,
+            #238f3b,
+            #16752d
+        );
+
+}
+
+
+.aqi-card.outdoor{
+
+    background:
+        linear-gradient(
+            135deg,
+            #e62c32,
+            #c91f25
+        );
+
+}
+
+
+.card-top{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+
+.card-title{
+
+    font-size:15px;
+
+    font-weight:700;
+
+}
+
+
+.card-tag{
+
+    background:rgba(255,255,255,.18);
+
+    border:1px solid rgba(255,255,255,.15);
+
+    border-radius:20px;
+
+    padding:6px 13px;
+
+    font-size:11px;
+
+    font-weight:700;
+
+    letter-spacing:1px;
+
+}
+
+
+/* =========================
+   GAUGE
+========================= */
+
+.gauge{
+
+    width:190px;
+
+    height:100px;
+
+    margin:30px auto 10px;
+
+    position:relative;
+
+    overflow:hidden;
+
+}
+
+
+.gauge::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:190px;
+
+    height:190px;
+
+    border-radius:50%;
+
+    border:12px solid rgba(255,255,255,.18);
+
+    border-bottom-color:transparent;
+
+    transform:rotate(-45deg);
+
+}
+
+
+.gauge-fill{
+
+    position:absolute;
+
+    width:190px;
+
+    height:190px;
+
+    border-radius:50%;
+
+    border:12px solid transparent;
+
+    border-top-color:white;
+
+    border-left-color:white;
+
+    transform:rotate(-45deg);
+
+    transition:transform .8s ease;
+
+}
+
+
+.gauge-center{
+
+    position:absolute;
+
+    left:50%;
+
+    bottom:0;
+
+    transform:translateX(-50%);
+
+    width:8px;
+
+    height:8px;
+
+    border-radius:50%;
+
+    background:white;
+
+}
+
+
+.gauge-needle{
+
+    position:absolute;
+
+    width:80px;
+
+    height:2px;
+
+    background:white;
+
+    left:50%;
+
+    bottom:3px;
+
+    transform-origin:left center;
+
+    transition:transform .8s ease;
+
+}
+
+
+.gauge-needle::after{
+
+    content:"";
+
+    position:absolute;
+
+    right:-4px;
+
+    top:-3px;
+
+    width:8px;
+
+    height:8px;
+
+    background:white;
+
+    border-radius:50%;
+
+}
+
+.aqi-value{
+
+    text-align:center;
+
+    font-size:50px;
+
+    font-weight:800;
+
+    line-height:1;
+
+}
+
+
+.aqi-label{
+
+    text-align:center;
+
+    font-size:13px;
+
+    margin-top:4px;
+
+}
+
+
+.air-quality-text{
+
+    text-align:center;
+
+    font-size:13px;
+
+    font-style:italic;
+
+    margin-top:12px;
+
+    opacity:.9;
+
+}
+
+
+.status-pill{
+
+    align-self:center;
+
+    margin-top:8px;
+
+    padding:8px 20px;
+
+    border-radius:30px;
+
+    background:rgba(255,255,255,.2);
+
+    font-weight:700;
+
+    font-size:15px;
+
+}
+
+.info-bar{
+
+    margin-top:20px;
+
+    background:white;
+
+    border-radius:18px;
+
+    padding:20px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    box-shadow:var(--shadow);
+
+}
+
+
+.info-icon{
+
+    width:42px;
+
+    height:42px;
+
+    border-radius:12px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:#e8f6ea;
+
+    font-size:21px;
+
+}
+
+
+.info-text strong{
+
+    display:block;
+
+    font-size:15px;
+
+}
+
+
+.info-text span{
+
+    display:block;
+
+    margin-top:4px;
+
+    color:var(--muted);
+
+    font-size:12px;
+
+}
+
+
+.details-grid{
+
+    margin-top:20px;
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:20px;
+
+}
+
+
+.detail-card{
+
+    background:white;
+
+    border-radius:18px;
+
+    padding:20px;
+
+    box-shadow:var(--shadow);
+
+}
+
+
+.detail-card h3{
+
+    font-size:15px;
+
+    margin-bottom:15px;
+
+}
+
+
+.room-row{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:9px 0;
+
+    border-bottom:1px solid #edf0f2;
+
+    font-size:13px;
+
+}
+
+
+.room-row:last-child{
+
+    border-bottom:none;
+
+}
+
+
+.room-value{
+
+    font-weight:700;
+
+}
+
+
+.scale{
+
+    margin-top:25px;
+
+    background:white;
+
+    border-radius:18px;
+
+    padding:20px;
+
+    box-shadow:var(--shadow);
+
+}
+
+
+.scale h3{
+
+    font-size:15px;
+
+    margin-bottom:15px;
+
+}
+
+
+.scale-bar{
+
+    height:18px;
+
+    border-radius:20px;
+
+    background:
+
+        linear-gradient(
+            to right,
+            #35a64a 0%,
+            #35a64a 10%,
+            #f9c23c 10%,
+            #f9c23c 20%,
+            #f28c28 20%,
+            #f28c28 30%,
+            #e3262e 30%,
+            #e3262e 40%,
+            #8e44ad 40%,
+            #8e44ad 60%,
+            #7e0023 60%,
+            #7e0023 100%
+        );
+
+}
+
+
+.scale-labels{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(6,1fr);
+
+    margin-top:8px;
+
+    font-size:10px;
+
+    color:#64748b;
+
+}
+
+
+.scale-labels div{
+
+    text-align:center;
+
+}
+
+
+.footer{
+
+    text-align:center;
+
+    margin-top:25px;
+
+    color:#94a3b8;
+
+    font-size:11px;
+
+}
+
+
+.footer strong{
+
+    color:#64748b;
+
+}
+
+.loading{
+
+    text-align:center;
+
+    padding:50px;
+
+    color:#64748b;
+
+}
+
+
+.error{
+
+    text-align:center;
+
+    padding:40px;
+
+    background:#fff;
+
+    border-radius:18px;
+
+    color:#b91c1c;
+
+}
+
+@media(max-width:768px){
+
+    .top-header{
+
+        padding:0 12px;
+
+    }
+
+
+    .brand-text h1{
+
+        font-size:14px;
+
+    }
+
+
+    .brand-text p{
+
+        font-size:9px;
+
+    }
+
+
+    .live{
+
+        display:none;
+
+    }
+
+
+    .clock{
+
+        font-size:11px;
+
+    }
+
+
+    .page{
+
+        padding:18px 12px 30px;
+
+    }
+
+
+    .page-title h2{
+
+        font-size:23px;
+
+    }
+
+
+    .campus-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+
+    .aqi-card{
+
+        min-height:330px;
+
+    }
+
+
+    .details-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+
+    .scale-labels{
+
+        font-size:8px;
+
+    }
+
+}
+
+
+@media(max-width:420px){
+
+    .back-btn{
+
+        padding:8px;
+
+        font-size:11px;
+
+    }
+
+
+    .brand-text{
+
+        display:none;
+
+    }
+
+
+    .aqi-value{
+
+        font-size:46px;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<header class="top-header">
+
+    <div class="brand">
+
+        <div class="logo">
+            ASB
+        </div>
+
+        <div class="brand-text">
+
+            <h1>
+                American School of Bombay
+            </h1>
+
+            <p>
+                Environmental Intelligence — AQI Comparison
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="header-right">
+
+        <div class="live">
+            ● LIVE
+        </div>
+
+        <div
+            class="clock"
+            id="clock"
+        >
+            --
+        </div>
+
+        <button
+            class="back-btn"
+            onclick="window.location.href='index.html'"
+        >
+            ← Dashboard
+        </button>
+
+    </div>
+
+</header>
+
+<main class="page">
+
+
+    <div class="page-title">
+
+        <h2>
+            Indoor Air Quality
+        </h2>
+
+        <p>
+            American School of Bombay — Campus AQI
+        </p>
+
+    </div>
+
+
+    <!-- CAMPUS CARDS -->
+
+    <div
+        class="campus-grid"
+        id="campusGrid"
+    >
+
+        <div class="loading">
+            Loading sensor data...
+        </div>
+
+    </div>
+
+
+    <!-- INFO -->
+
+    <div
+        class="info-bar"
+        id="infoBar"
+    >
+
+        <div class="info-icon">
+            🛡️
+        </div>
+
+        <div class="info-text">
+
+            <strong id="infoTitle">
+                Calculating indoor air quality...
+            </strong>
+
+            <span id="infoText">
+                Please wait while the sensor readings are loaded.
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- ROOM DETAILS -->
+
+    <div
+        class="details-grid"
+        id="detailsGrid"
+    >
+    </div>
+
+
+    <!-- AQI SCALE -->
+
+    <div class="scale">
+
+        <h3>
+            American AQI Scale
+        </h3>
+
+        <div class="scale-bar"></div>
+
+        <div class="scale-labels">
+
+            <div>
+                0–50<br>
+                Good
+            </div>
+
+            <div>
+                51–100<br>
+                Moderate
+            </div>
+
+            <div>
+                101–150<br>
+                Unhealthy<br>for Sensitive
+            </div>
+
+            <div>
+                151–200<br>
+                Unhealthy
+            </div>
+
+            <div>
+                201–300<br>
+                Very Unhealthy
+            </div>
+
+            <div>
+                301–500<br>
+                Hazardous
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="footer">
+
+        <strong>
+            ASB Environmental Intelligence
+        </strong>
+
+        <br>
+
+        Last updated:
+        <span id="lastUpdated">
+            --
+        </span>
+
+    </div>
+
+
+</main>
+
+
+<script type="module">
+
+/* =========================
+   FIREBASE AUTH
+========================= */
+
+import {
+    initializeApp
+} from
+"https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+
+
+import {
+    getAuth,
+    onAuthStateChanged
+} from
+"https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+
+/* =========================
+   FIREBASE CONFIG
+========================= */
+
+const firebaseConfig = {
+
+    apiKey:
+        "AIzaSyBm_1vafDiRkCJ0RVZj6qhePa8jPSMDVBA",
+
+    authDomain:
+        "asbaqidashboard.firebaseapp.com",
+
+    projectId:
+        "asbaqidashboard",
+
+    storageBucket:
+        "asbaqidashboard.firebasestorage.app",
+
+    messagingSenderId:
+        "620753232704",
+
+    appId:
+        "1:620753232704:web:4e45327a52c66a0b9550a5",
+
+    measurementId:
+        "G-M5KREWX0VE"
+
+};
+
+
+const firebaseApp =
+    initializeApp(firebaseConfig);
+
+
+const auth =
+    getAuth(firebaseApp);
+
+
+/* =========================
+   API
+========================= */
+
+const API_BASE =
+    "https://asb-aqi-api.onrender.com";
+
+
+/* =========================
+   ROOM LISTS
+========================= */
+
+const ESC_ROOMS = [
+
+    "Ground Floor Pre-k Class",
+
+    "1st Floor Art Class",
+
+    "1st Floor KG Class",
+
+    "2nd Floor Grade 1",
+
+    "2nd Floor Grade 2",
+
+    "3rd Floor Music Class",
+
+    "3rd Floor Art Class",
+
+    "4th Floor Grade 3",
+
+    "4th Floor MPH",
+
+    "4th F. Tech Office",
+
+    "5th Floor Grade 4",
+
+    "5th Floor Grade 5",
+
+    "6th Floor MPH",
+
+    "6th Floor OCC"
+
+];
+
+
+const SSC_ROOMS = [
+
+    "401",
+
+    "402",
+
+    "301",
+
+    "302",
+
+    "Band Room",
+
+    "Choir Room",
+
+    "201",
+
+    "MPH"
+
+];
+
+
+/* =========================
+   NORMALIZE ROOM NAMES
+========================= */
+
+function normalizeRoom(name){
+
+    return String(name || "")
+
+        .toLowerCase()
+
+        .replace(/\./g,"")
+
+        .replace(/\s+/g," ")
+
+        .trim();
+
+}
+
+
+/* =========================
+   FIND ROOM
+========================= */
+
+function roomMatches(sensorName, roomName){
+
+    const sensor =
+        normalizeRoom(sensorName);
+
+    const room =
+        normalizeRoom(roomName);
+
+
+    if(sensor === room)
+        return true;
+
+
+    /*
+       Allows:
+
+       "4th floor 401"
+       "401"
+
+       "3rd floor band room"
+       "Band Room"
+
+       etc.
+    */
+
+    if(
+        sensor.endsWith(" " + room) ||
+        sensor === room
+    ){
+
+        return true;
+
+    }
+
+
+    return false;
+
+}
+
+
+/* =========================
+   CALCULATE AVERAGE
+========================= */
+
+function calculateAverage(
+    rooms,
+    sensors
+){
+
+    const matched =
+        sensors.filter(sensor =>
+
+            rooms.some(room =>
+
+                roomMatches(
+                    sensor.name,
+                    room
+                )
+
+            )
+
+        );
+
+
+    if(!matched.length){
+
+        return {
+
+            average:null,
+
+            sensors:[]
+
+        };
+
+    }
+
+
+    const valid =
+        matched.filter(sensor =>
+
+            Number.isFinite(
+                Number(sensor.iaq)
+            )
+
+        );
+
+
+    if(!valid.length){
+
+        return {
+
+            average:null,
+
+            sensors:matched
+
+        };
+
+    }
+
+
+    const total =
+        valid.reduce(
+
+            (sum,sensor) =>
+
+                sum +
+                Number(sensor.iaq),
+
+            0
+
+        );
+
+
+    return {
+
+        average:
+            Math.round(
+                total / valid.length
+            ),
+
+        sensors:valid
+
+    };
+
+}
+
+
+/* =========================
+   AMERICAN AQI STATUS
+========================= */
+
+function getAQIStatus(aqi){
+
+    if(aqi === null)
+        return {
+
+            text:"No Data",
+
+            className:""
+
+        };
+
+
+    if(aqi <= 50)
+        return {
+
+            text:"Good",
+
+            className:"good"
+
+        };
+
+
+    if(aqi <= 100)
+        return {
+
+            text:"Moderate",
+
+            className:"moderate"
+
+        };
+
+
+    if(aqi <= 150)
+        return {
+
+            text:
+                "Unhealthy for Sensitive Groups",
+
+            className:"sensitive"
+
+        };
+
+
+    if(aqi <= 200)
+        return {
+
+            text:"Unhealthy",
+
+            className:"unhealthy"
+
+        };
+
+
+    if(aqi <= 300)
+        return {
+
+            text:"Very Unhealthy",
+
+            className:"very-unhealthy"
+
+        };
+
+
+    return {
+
+        text:"Hazardous",
+
+        className:"hazardous"
+
+    };
+
+}
+
+
+/* =========================
+   GAUGE
+========================= */
+
+function gaugeRotation(aqi){
+
+    if(aqi === null)
+        return -45;
+
+
+    const limited =
+        Math.min(
+            Math.max(aqi,0),
+            500
+        );
+
+
+    /*
+       Convert 0–500 into
+       roughly -45° to +135°
+    */
+
+    return -45 +
+        (limited / 500) * 180;
+
+}
+
+
+/* =========================
+   CREATE CAMPUS CARD
+========================= */
+
+function createCampusCard(
+    title,
+    average,
+    type
+){
+
+    const status =
+        getAQIStatus(average);
+
+
+    const rotation =
+        gaugeRotation(average);
+
+
+    const card =
+        document.createElement("div");
+
+
+    card.className =
+        `aqi-card ${type}`;
+
+
+    card.innerHTML = `
+
+        <div class="card-top">
+
+            <div class="card-title">
+                ${title}
+            </div>
+
+            <div class="card-tag">
+                INDOOR
+            </div>
+
+        </div>
+
+
+        <div class="gauge">
+
+            <div
+                class="gauge-fill"
+                style="
+                    transform:
+                    rotate(${rotation}deg);
+                "
+            ></div>
+
+            <div
+                class="gauge-needle"
+                style="
+                    transform:
+                    rotate(${rotation}deg);
+                "
+            ></div>
+
+            <div class="gauge-center"></div>
+
+        </div>
+
+
+        <div class="aqi-value">
+            ${average ?? "--"}
+        </div>
+
+
+        <div class="aqi-label">
+            AQI
+        </div>
+
+
+        <div class="air-quality-text">
+            Air Quality is
+        </div>
+
+
+        <div class="status-pill">
+            ${status.text}
+        </div>
+
+    `;
+
+
+    return card;
+
+}
+
+
+/* =========================
+   ROOM DETAILS
+========================= */
+
+function createRoomDetails(
+    title,
+    sensors
+){
+
+    const card =
+        document.createElement("div");
+
+
+    card.className =
+        "detail-card";
+
+
+    const rows =
+        sensors
+            .sort(
+                (a,b) =>
+                    Number(a.iaq) -
+                    Number(b.iaq)
+            )
+            .map(sensor => `
+
+                <div class="room-row">
+
+                    <span>
+                        ${sensor.name}
+                    </span>
+
+                    <span class="room-value">
+                        ${sensor.iaq}
+                    </span>
+
+                </div>
+
+            `)
+            .join("");
+
+
+    card.innerHTML = `
+
+        <h3>
+            ${title} Sensors
+        </h3>
+
+        ${rows || `
+            <div class="room-row">
+                <span>
+                    No matching sensors found
+                </span>
+            </div>
+        `}
+
+    `;
+
+
+    return card;
+
+}
+
+
+/* =========================
+   UPDATE INFO
+========================= */
+
+function updateInfo(
+    escAverage,
+    sscAverage
+){
+
+    const values =
+        [
+            escAverage,
+            sscAverage
+        ]
+        .filter(
+            value =>
+                value !== null
+        );
+
+
+    if(!values.length){
+
+        document.getElementById(
+            "infoTitle"
+        ).innerText =
+            "No AQI data available";
+
+
+        document.getElementById(
+            "infoText"
+        ).innerText =
+            "No matching indoor sensor readings were found.";
+
+        return;
+
+    }
+
+
+    const overall =
+        Math.round(
+
+            values.reduce(
+                (a,b) => a+b,
+                0
+            )
+            /
+            values.length
+
+        );
+
+
+    document.getElementById(
+        "infoTitle"
+    ).innerText =
+        `Indoor average AQI is ${overall}`;
+
+
+    document.getElementById(
+        "infoText"
+    ).innerText =
+        "This value is calculated from the selected ASB indoor sensor readings.";
+
+}
+
+
+/* =========================
+   LOAD DATA
+========================= */
+
+async function loadAQIData(){
+
+    try{
+
+        const response =
+            await fetch(
+                `${API_BASE}/api/sensors`
+            );
+
+
+        if(!response.ok){
+
+            throw new Error(
+                "Unable to load sensor data."
+            );
+
+        }
+
+
+        const sensors =
+            await response.json();
+
+
+        const esc =
+            calculateAverage(
+                ESC_ROOMS,
+                sensors
+            );
+
+
+        const ssc =
+            calculateAverage(
+                SSC_ROOMS,
+                sensors
+            );
+
+
+        const campusGrid =
+            document.getElementById(
+                "campusGrid"
+            );
+
+
+        campusGrid.innerHTML = "";
+
+
+        campusGrid.appendChild(
+
+            createCampusCard(
+                "ESC Average",
+                esc.average,
+                "esc"
+            )
+
+        );
+
+
+        campusGrid.appendChild(
+
+            createCampusCard(
+                "SSC Average",
+                ssc.average,
+                "ssc"
+            )
+
+        );
+
+
+        const detailsGrid =
+            document.getElementById(
+                "detailsGrid"
+            );
+
+
+        detailsGrid.innerHTML = "";
+
+
+        detailsGrid.appendChild(
+
+            createRoomDetails(
+                "ESC",
+                esc.sensors
+            )
+
+        );
+
+
+        detailsGrid.appendChild(
+
+            createRoomDetails(
+                "SSC",
+                ssc.sensors
+            )
+
+        );
+
+
+        updateInfo(
+            esc.average,
+            ssc.average
+        );
+
+
+        const now =
+            new Date();
+
+
+        document.getElementById(
+            "lastUpdated"
+        ).innerText =
+            now.toLocaleString();
+
+
+    }
+    catch(error){
+
+        console.error(error);
+
+
+        document.getElementById(
+            "campusGrid"
+        ).innerHTML = `
+
+            <div class="error">
+
+                Unable to load AQI data.
+
+                <br><br>
+
+                Please try refreshing the page.
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================
+   CLOCK
+========================= */
+
+function updateClock(){
+
+    document.getElementById(
+        "clock"
+    ).innerText =
+        new Date().toLocaleTimeString();
+
+}
+
+
+setInterval(
+    updateClock,
+    1000
+);
+
+updateClock();
+
+
+/* =========================
+   AUTH
+========================= */
+
+const allowedUsers = [
+
+    "shettyd@asbindia.org",
+
+    "fisherym@asbindia.org",
+
+    "security@asbindia.org",
+
+    "murukatec@asbindia.org",
+
+    "mores@asbindia.org",
+
+    "sandbhorp@asbindia.org",
+
+    "software@asbindia.org",
+
+    "swinehartj@asbindia.org",
+
+    "richardsp@asbindia.org",
+
+    "shindea@asbindia.org"
+
+];
+
+
+onAuthStateChanged(
+    auth,
+    user => {
+
+        if(
+            user &&
+            allowedUsers.includes(
+                user.email.toLowerCase()
+            )
+        ){
+
+            loadAQIData();
+
+            /*
+               Refresh sensor readings
+               every 30 seconds.
+            */
+
+            setInterval(
+                loadAQIData,
+                30000
+            );
+
+        }
+        else{
+
+            document.body.innerHTML = `
+
+                <div style="
+                    min-height:100vh;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    background:#eef3f8;
+                    font-family:Arial;
+                    padding:20px;
+                ">
+
+                    <div style="
+                        background:white;
+                        padding:35px;
+                        border-radius:20px;
+                        text-align:center;
+                        box-shadow:
+                            0 10px 30px
+                            rgba(0,0,0,.1);
+                    ">
+
+                        <h2>
+                            Access Denied
+                        </h2>
+
+                        <p style="
+                            margin-top:10px;
+                            color:#64748b;
+                        ">
+                            Please sign in through
+                            the ASB dashboard first.
+                        </p>
+
+                        <button
+                            onclick="
+                                window.location.href='index.html'
+                            "
+                            style="
+                                margin-top:20px;
+                                padding:10px 18px;
+                                border:none;
+                                border-radius:10px;
+                                background:#00573F;
+                                color:white;
+                                cursor:pointer;
+                            "
+                        >
+                            Back to Dashboard
+                        </button>
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+
+</html>
