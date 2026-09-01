@@ -1021,7 +1021,7 @@ body{
 
 
 <!-- =====================================================
-     MAIN PAGE
+     MAIN
 ===================================================== -->
 
 <main class="page">
@@ -1040,9 +1040,7 @@ body{
     </div>
 
 
-    <!-- =================================================
-         CAMPUS CARDS
-    ================================================= -->
+    <!-- CAMPUS CARDS -->
 
     <div
         class="campus-grid"
@@ -1050,15 +1048,15 @@ body{
     >
 
         <div class="loading">
+
             Loading sensor data...
+
         </div>
 
     </div>
 
 
-    <!-- =================================================
-         INFO
-    ================================================= -->
+    <!-- INFO -->
 
     <div
         class="info-bar"
@@ -1084,9 +1082,7 @@ body{
     </div>
 
 
-    <!-- =================================================
-         SENSOR DETAILS
-    ================================================= -->
+    <!-- SENSOR DETAILS -->
 
     <div
         class="details-grid"
@@ -1095,9 +1091,7 @@ body{
     </div>
 
 
-    <!-- =================================================
-         AQI SCALE
-    ================================================= -->
+    <!-- AMERICAN AQI SCALE -->
 
     <div class="scale">
 
@@ -1145,15 +1139,17 @@ body{
     </div>
 
 
-    <!-- =================================================
-         FOOTER
-    ================================================= -->
+    <!-- FOOTER -->
 
     <div class="footer">
 
         <strong>
             ASB Environmental Intelligence
         </strong>
+
+        <br>
+
+        PM2.5 converted to American AQI
 
         <br>
 
@@ -1277,6 +1273,152 @@ const allowedUsers = [
 
 
 /* =====================================================
+   PM2.5 → AMERICAN AQI
+===================================================== */
+
+/*
+    PM2.5 must be in µg/m³.
+
+    The concentration is truncated
+    to one decimal place before
+    calculating AQI.
+
+    These are the US EPA PM2.5
+    AQI breakpoints.
+*/
+
+function pm25ToAQI(pm25){
+
+    let concentration =
+        Number(pm25);
+
+
+    if(
+        !Number.isFinite(concentration) ||
+        concentration < 0
+    ){
+
+        return null;
+
+    }
+
+
+    /*
+       Truncate PM2.5 to
+       one decimal place.
+    */
+
+    concentration =
+        Math.floor(
+            concentration * 10
+        ) / 10;
+
+
+    const breakpoints = [
+
+        {
+            cLow:0.0,
+            cHigh:9.0,
+            aqiLow:0,
+            aqiHigh:50
+        },
+
+        {
+            cLow:9.1,
+            cHigh:35.4,
+            aqiLow:51,
+            aqiHigh:100
+        },
+
+        {
+            cLow:35.5,
+            cHigh:55.4,
+            aqiLow:101,
+            aqiHigh:150
+        },
+
+        {
+            cLow:55.5,
+            cHigh:125.4,
+            aqiLow:151,
+            aqiHigh:200
+        },
+
+        {
+            cLow:125.5,
+            cHigh:225.4,
+            aqiLow:201,
+            aqiHigh:300
+        },
+
+        {
+            cLow:225.5,
+            cHigh:325.4,
+            aqiLow:301,
+            aqiHigh:500
+        }
+
+    ];
+
+
+    for(
+        const bp of breakpoints
+    ){
+
+        if(
+            concentration >= bp.cLow &&
+            concentration <= bp.cHigh
+        ){
+
+            const aqi =
+
+                (
+                    (
+                        bp.aqiHigh -
+                        bp.aqiLow
+                    )
+                    /
+                    (
+                        bp.cHigh -
+                        bp.cLow
+                    )
+                )
+                *
+                (
+                    concentration -
+                    bp.cLow
+                )
+                +
+                bp.aqiLow;
+
+
+            return Math.round(aqi);
+
+        }
+
+    }
+
+
+    /*
+       PM2.5 above 325.4
+       is capped at AQI 500.
+    */
+
+    if(
+        concentration > 325.4
+    ){
+
+        return 500;
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =====================================================
    AMERICAN AQI STATUS
 ===================================================== */
 
@@ -1284,96 +1426,68 @@ function getAQIStatus(aqi){
 
     if(aqi === null){
 
-        return {
-
-            text:"No Data"
-
-        };
+        return "No Data";
 
     }
 
 
     if(aqi <= 50){
 
-        return {
-
-            text:"Good"
-
-        };
+        return "Good";
 
     }
 
 
     if(aqi <= 100){
 
-        return {
-
-            text:"Moderate"
-
-        };
+        return "Moderate";
 
     }
 
 
     if(aqi <= 150){
 
-        return {
-
-            text:
-                "Unhealthy for Sensitive Groups"
-
-        };
+        return "Unhealthy for Sensitive Groups";
 
     }
 
 
     if(aqi <= 200){
 
-        return {
-
-            text:"Unhealthy"
-
-        };
+        return "Unhealthy";
 
     }
 
 
     if(aqi <= 300){
 
-        return {
-
-            text:"Very Unhealthy"
-
-        };
+        return "Very Unhealthy";
 
     }
 
 
-    return {
-
-        text:"Hazardous"
-
-    };
+    return "Hazardous";
 
 }
 
 
 /* =====================================================
-   CALCULATE CAMPUS AVERAGE
+   CAMPUS AVERAGE
 ===================================================== */
 
 /*
     IMPORTANT:
 
-    We are NOT using the room list anymore.
+    ESC uses EVERY sensor whose
+    network is Elementary Campus - Kurla.
 
-    ESC = every sensor where:
-        sensor.network ===
-        "Elementary Campus - Kurla"
+    SSC uses EVERY sensor whose
+    network is Secondary Campus - BKC.
 
-    SSC = every sensor where:
-        sensor.network ===
-        "Secondary Campus - BKC"
+    We then convert EACH sensor's
+    PM2.5 to American AQI.
+
+    Finally we average those AQI values.
 */
 
 function calculateCampusAverage(
@@ -1383,32 +1497,62 @@ function calculateCampusAverage(
 
     const campusSensors =
         sensors.filter(
-            sensor =>
+            sensor => {
 
-                String(sensor.network || "")
-                    .trim()
-                    .toLowerCase()
+                return String(
+                    sensor.network || ""
+                )
+                .trim()
+                .toLowerCase()
                 ===
                 campus
                     .trim()
-                    .toLowerCase()
-        );
-
-
-    const validSensors =
-        campusSensors.filter(
-            sensor => {
-
-                const value =
-                    Number(sensor.iaq);
-
-                return Number.isFinite(value);
+                    .toLowerCase();
 
             }
         );
 
 
-    if(!validSensors.length){
+    /*
+       Convert PM2.5 of every sensor
+       into American AQI.
+    */
+
+    const convertedSensors =
+        campusSensors
+            .map(sensor => {
+
+                const pm25 =
+                    Number(
+                        sensor.pm25
+                    );
+
+
+                const aqi =
+                    pm25ToAQI(
+                        pm25
+                    );
+
+
+                return {
+
+                    ...sensor,
+
+                    calculatedAQI:
+                        aqi
+
+                };
+
+            })
+            .filter(
+                sensor =>
+                    sensor.calculatedAQI !== null
+            );
+
+
+    if(
+        convertedSensors.length === 0
+    ){
 
         return {
 
@@ -1421,13 +1565,16 @@ function calculateCampusAverage(
     }
 
 
-    const total =
-        validSensors.reduce(
+    const totalAQI =
+        convertedSensors.reduce(
 
-            (sum,sensor) => {
+            (
+                sum,
+                sensor
+            ) => {
 
                 return sum +
-                    Number(sensor.iaq);
+                    sensor.calculatedAQI;
 
             },
 
@@ -1436,16 +1583,20 @@ function calculateCampusAverage(
         );
 
 
+    const averageAQI =
+        Math.round(
+            totalAQI /
+            convertedSensors.length
+        );
+
+
     return {
 
         average:
-            Math.round(
-                total /
-                validSensors.length
-            ),
+            averageAQI,
 
         sensors:
-            validSensors
+            convertedSensors
 
     };
 
@@ -1453,49 +1604,18 @@ function calculateCampusAverage(
 
 
 /* =====================================================
-   GAUGE CALCULATION
+   GAUGE
 ===================================================== */
 
 /*
-    American AQI goes from 0 to 500.
+    Gauge runs from:
 
-    The gauge is a semicircle.
+    0 AQI   = left
+    250 AQI = top
+    500 AQI = right
 
-    0 AQI  = -90 degrees
-    250    =   0 degrees
-    500    =  90 degrees
+    This is a real 0–500 scale.
 */
-
-function getGaugeAngle(aqi){
-
-    if(aqi === null){
-
-        return 0;
-
-    }
-
-
-    const limited =
-        Math.max(
-            0,
-            Math.min(
-                500,
-                aqi
-            )
-        );
-
-
-    return -90 +
-        (
-            limited / 500
-        ) * 180;
-
-}
-
-
-/* =====================================================
-   GAUGE SVG
-===================================================== */
 
 function createGauge(){
 
@@ -1508,8 +1628,6 @@ function createGauge(){
                 viewBox="0 0 250 155"
             >
 
-                <!-- BACKGROUND -->
-
                 <path
                     class="gauge-background"
                     d="
@@ -1519,11 +1637,8 @@ function createGauge(){
                 ></path>
 
 
-                <!-- ACTIVE -->
-
                 <path
                     class="gauge-progress"
-                    id="gaugeProgress"
                     d="
                         M 35 125
                         A 90 90 0 0 1 215 125
@@ -1535,7 +1650,6 @@ function createGauge(){
 
             <div
                 class="gauge-needle"
-                id="gaugeNeedle"
             ></div>
 
 
@@ -1571,16 +1685,26 @@ function setGauge(
         );
 
 
-    if(!progress || !needle)
+    if(
+        !progress ||
+        !needle
+    ){
+
         return;
+
+    }
 
 
     /*
-       Approximate length of the
-       semicircle path.
+       Semicircle length:
+
+       π × radius
+
+       π × 90 ≈ 282.74
     */
 
-    const pathLength = 283;
+    const pathLength =
+        282.74;
 
 
     progress.style.strokeDasharray =
@@ -1590,26 +1714,28 @@ function setGauge(
     let percentage = 0;
 
 
-    if(aqi !== null){
+    if(
+        aqi !== null
+    ){
 
         percentage =
             Math.max(
                 0,
                 Math.min(
                     100,
-                    Number(aqi) / 500 * 100
+                    (
+                        Number(aqi) /
+                        500
+                    ) *
+                    100
                 )
             );
 
     }
 
 
-    /*
-       Move the white arc according
-       to the AQI.
-    */
-
     progress.style.strokeDashoffset =
+
         pathLength -
         (
             pathLength *
@@ -1619,18 +1745,47 @@ function setGauge(
 
 
     /*
-       Move the needle.
+       Needle:
 
-       Gauge center is approximately
-       x=125, y=125.
+       0 AQI
+          ↓
+       180 degrees = LEFT
 
-       -90° points left.
-       0° points up.
-       +90° points right.
+       250 AQI
+          ↓
+       90 degrees = TOP
+
+       500 AQI
+          ↓
+       0 degrees = RIGHT
     */
 
-    const angle =
-        getGaugeAngle(aqi);
+    let angle = 180;
+
+
+    if(
+        aqi !== null
+    ){
+
+        const limitedAQI =
+            Math.max(
+                0,
+                Math.min(
+                    500,
+                    Number(aqi)
+                )
+            );
+
+
+        angle =
+            180 -
+            (
+                limitedAQI /
+                500
+            ) *
+            180;
+
+    }
 
 
     needle.style.transform =
@@ -1640,7 +1795,7 @@ function setGauge(
 
 
 /* =====================================================
-   CREATE CAMPUS CARD
+   CAMPUS CARD
 ===================================================== */
 
 function createCampusCard(
@@ -1650,7 +1805,9 @@ function createCampusCard(
 ){
 
     const card =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
 
     card.className =
@@ -1662,7 +1819,9 @@ function createCampusCard(
 
 
     const status =
-        getAQIStatus(average);
+        getAQIStatus(
+            average
+        );
 
 
     card.innerHTML = `
@@ -1670,11 +1829,16 @@ function createCampusCard(
         <div class="card-top">
 
             <div class="card-title">
+
                 ${title}
+
             </div>
 
+
             <div class="card-tag">
+
                 INDOOR
+
             </div>
 
         </div>
@@ -1706,7 +1870,7 @@ function createCampusCard(
 
         <div class="status-pill">
 
-            ${status.text}
+            ${status}
 
         </div>
 
@@ -1715,17 +1879,18 @@ function createCampusCard(
 
             Based on
             ${result.sensors.length}
-            sensor${result.sensors.length === 1 ? "" : "s"}
+            PM2.5 sensor${
+
+                result.sensors.length === 1
+                    ? ""
+                    : "s"
+
+            }
 
         </div>
 
     `;
 
-
-    /*
-       Set gauge AFTER the HTML
-       has been inserted.
-    */
 
     setTimeout(
         () => {
@@ -1746,7 +1911,7 @@ function createCampusCard(
 
 
 /* =====================================================
-   ROOM / SENSOR DETAILS
+   SENSOR DETAILS
 ===================================================== */
 
 function createSensorDetails(
@@ -1755,7 +1920,9 @@ function createSensorDetails(
 ){
 
     const card =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
 
     card.className =
@@ -1765,8 +1932,13 @@ function createSensorDetails(
     const sorted =
         [...sensors].sort(
             (a,b) =>
-                Number(a.iaq) -
-                Number(b.iaq)
+                Number(
+                    a.calculatedAQI
+                )
+                -
+                Number(
+                    b.calculatedAQI
+                )
         );
 
 
@@ -1777,11 +1949,31 @@ function createSensorDetails(
                 <div class="room-row">
 
                     <span>
+
                         ${sensor.name}
+
                     </span>
 
+
                     <span class="room-value">
-                        ${sensor.iaq}
+
+                        AQI ${sensor.calculatedAQI}
+
+                        <br>
+
+                        <small style="
+                            font-weight:400;
+                            color:#718096;
+                        ">
+
+                            PM2.5:
+                            ${Number(
+                                sensor.pm25
+                            ).toFixed(1)}
+                            µg/m³
+
+                        </small>
+
                     </span>
 
                 </div>
@@ -1793,19 +1985,27 @@ function createSensorDetails(
     card.innerHTML = `
 
         <h3>
+
             ${title} Sensors
+
         </h3>
+
 
         ${
             rows ||
+
             `
+
                 <div class="room-row">
 
                     <span>
+
                         No sensors found
+
                     </span>
 
                 </div>
+
             `
         }
 
@@ -1818,7 +2018,7 @@ function createSensorDetails(
 
 
 /* =====================================================
-   UPDATE INFO
+   INFO
 ===================================================== */
 
 function updateInfo(
@@ -1838,7 +2038,9 @@ function updateInfo(
     );
 
 
-    if(!values.length){
+    if(
+        values.length === 0
+    ){
 
         document.getElementById(
             "infoTitle"
@@ -1849,7 +2051,7 @@ function updateInfo(
         document.getElementById(
             "infoText"
         ).innerText =
-            "No valid AQI readings were returned from the campus sensors.";
+            "No valid PM2.5 readings were returned.";
 
         return;
 
@@ -1860,8 +2062,11 @@ function updateInfo(
         Math.round(
 
             values.reduce(
-                (a,b) =>
-                    a + b,
+                (
+                    total,
+                    value
+                ) =>
+                    total + value,
 
                 0
             )
@@ -1874,19 +2079,21 @@ function updateInfo(
     document.getElementById(
         "infoTitle"
     ).innerText =
-        `Indoor campus average AQI is ${overall}`;
+
+        `Indoor campus AQI average is ${overall}`;
 
 
     document.getElementById(
         "infoText"
     ).innerText =
-        `ESC and SSC averages are calculated using all active AQI sensors assigned to their respective campus.`;
+
+        "Each campus average is calculated from all available PM2.5 sensors assigned to that campus using the American AQI scale.";
 
 }
 
 
 /* =====================================================
-   LOAD AQI DATA
+   LOAD DATA
 ===================================================== */
 
 async function loadAQIData(){
@@ -1899,7 +2106,9 @@ async function loadAQIData(){
             );
 
 
-        if(!response.ok){
+        if(
+            !response.ok
+        ){
 
             throw new Error(
                 "Unable to load sensor data."
@@ -1913,16 +2122,14 @@ async function loadAQIData(){
 
 
         console.log(
-            "All sensors:",
+            "ALL SENSOR DATA:",
             sensors
         );
 
 
-        /*
-           ESC:
-           ALL sensors belonging to
-           Elementary Campus - Kurla
-        */
+        /* =============================================
+           ESC
+        ============================================= */
 
         const esc =
             calculateCampusAverage(
@@ -1931,11 +2138,9 @@ async function loadAQIData(){
             );
 
 
-        /*
-           SSC:
-           ALL sensors belonging to
-           Secondary Campus - BKC
-        */
+        /* =============================================
+           SSC
+        ============================================= */
 
         const ssc =
             calculateCampusAverage(
@@ -1945,13 +2150,13 @@ async function loadAQIData(){
 
 
         console.log(
-            "ESC:",
+            "ESC PM2.5 → AQI:",
             esc
         );
 
 
         console.log(
-            "SSC:",
+            "SSC PM2.5 → AQI:",
             ssc
         );
 
@@ -2123,7 +2328,7 @@ onAuthStateChanged(
 
 
             /*
-               Refresh every 30 seconds.
+               Update every 30 seconds.
             */
 
             setInterval(
@@ -2160,6 +2365,7 @@ onAuthStateChanged(
                         <h2>
                             Access Denied
                         </h2>
+
 
                         <p style="
                             margin-top:10px;
