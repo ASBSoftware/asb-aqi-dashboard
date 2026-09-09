@@ -1202,21 +1202,26 @@ document.addEventListener(
             30000
         );
 
-        const allowedUsers = [
+      const allowedUsers = [
 
-            "shettyd@asbindia.org",
-            "fisherym@asbindia.org",
-            "security@asbindia.org",
-            "murukatec@asbindia.org",
-            "mores@asbindia.org",
-            "sandbhorp@asbindia.org",
-            "software@asbindia.org",
-            "swinehartj@asbindia.org",
-            "richardsp@asbindia.org",
-            "shindea@asbindia.org"
+    "shettyd@asbindia.org",
+    "fisherym@asbindia.org",
+    "security@asbindia.org",
+    "murukatec@asbindia.org",
+    "mores@asbindia.org",
+    "sandbhorp@asbindia.org",
+    "software@asbindia.org",
+    "swinehartj@asbindia.org",
+    "richardsp@asbindia.org",
+    "shindea@asbindia.org",
 
-        ];
+    "dhatrakr@asbindia.org",
+    "mhapankara@asbindia.org",
+    "sabler@asbindia.org",
+    "kaleS@asbindia.org",
+    "shethiar@asbindia.org"
 
+];
         document
             .getElementById(
                 "loginBtn"
