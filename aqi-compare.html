@@ -1249,25 +1249,25 @@ const ESC_AQI_SENSORS = [
 
 const SSC_AQI_SENSORS = [
 
-    "2nd floor 201",
+    "201",
 
-    "3rd floor 301",
+    "301",
 
-    "3rd floor 302",
+    "302",
 
-    "4th floor 401",
+    "401",
 
-    "4th floor 402",
+    "402",
 
-    "3rd floor Band room",
+    "Band Room",
 
-    "3rd floor choir room",
+    "Choir Room",
 
-    "1st floor mph",
+    "MPH",
 
-    "ground floor G17",
+    "G-17",
 
-    "ground floor G-3"
+    "G-3"
 
 ];
 
@@ -1646,9 +1646,23 @@ function getSelectedRoomKey(name){
 
 
     /*
-       Room numbers are unique identifiers for the
-       SSC rooms we selected.
+       The actual Meraki names shown for SSC are:
+
+       201
+       301
+       302
+       401
+       402
+       Band Room
+       Choir Room
+       MPH
+       G-17
+       G-3
+
+       The key below also accepts floor prefixes and
+       hyphen/spacing differences.
     */
+
 
     const roomNumberMatch =
         value.match(
@@ -1673,7 +1687,8 @@ function getSelectedRoomKey(name){
 
 
     if(
-        value.includes("choir room")
+        value.includes("choir room") ||
+        value.includes("chair room")
     ){
 
         return "choir room";
@@ -1681,26 +1696,30 @@ function getSelectedRoomKey(name){
     }
 
 
+    /*
+       MPH is the actual Meraki sensor name shown
+       in the user's Meraki screenshot.
+    */
+
     if(
-        value.includes("1st floor mph")
+        value === "mph" ||
+        value.endsWith(" mph") ||
+        value.includes(" mph ")
     ){
 
-        return "1st floor mph";
+        return "mph";
 
     }
 
 
     /*
-       G17 and G3 are normalized so:
-       G-17 -> g17
-       G 17 -> g 17
-       G-3  -> g 3
-       G3   -> g3
+       G-17 / G 17 / G17
     */
 
     if(
-        /\bg\s*17\b/.test(value) ||
-        value.includes("g17")
+        value === "g 17" ||
+        value === "g17" ||
+        /\bg\s*17\b/.test(value)
     ){
 
         return "g17";
@@ -1708,9 +1727,14 @@ function getSelectedRoomKey(name){
     }
 
 
+    /*
+       G-3 / G 3 / G3
+    */
+
     if(
-        /\bg\s*3\b/.test(value) ||
-        value.includes("g3")
+        value === "g 3" ||
+        value === "g3" ||
+        /\bg\s*3\b/.test(value)
     ){
 
         return "g3";
@@ -1737,7 +1761,7 @@ function sensorMatchesSelectedRoom(
 
 
     /*
-       First try exact normalized matching.
+       Exact normalized match first.
     */
 
     if(
@@ -1748,16 +1772,6 @@ function sensorMatchesSelectedRoom(
 
     }
 
-
-    /*
-       Then use the stable room key.
-       This handles names such as:
-
-       "Secondary Campus - BKC - 4th floor 401"
-       "4th floor- 401"
-       "3rd floor Band Room - BKC"
-       etc.
-    */
 
     const targetKey =
         getSelectedRoomKey(target);
@@ -1782,6 +1796,41 @@ function sensorMatchesSelectedRoom(
 }
 
 
+function isSensorActive(sensor){
+
+    /*
+       The Render API should already remove offline
+       and dormant sensors.
+
+       This frontend check is deliberately defensive:
+       known offline states are rejected, while unknown/
+       missing states are allowed so a harmless API status
+       format change does not make every SSC sensor vanish.
+    */
+
+    const status =
+        String(
+            sensor?.status ?? ""
+        )
+        .toLowerCase()
+        .trim();
+
+
+    if(
+        status === "offline" ||
+        status === "dormant"
+    ){
+
+        return false;
+
+    }
+
+
+    return true;
+
+}
+
+
 function calculateSelectedCampusAverage(
     sensors,
     campus,
@@ -1789,51 +1838,22 @@ function calculateSelectedCampusAverage(
 ){
 
     /*
-       The selected room list is the source of truth.
+       Do not use sensor.network here.
 
-       We do NOT depend on sensor.network here.
-       This is important because the network name returned
-       by Meraki does not have to match our campus label.
+       The actual Meraki sensor names are the source of
+       truth for this comparison page.
     */
 
-
-    /*
-       Keep only active sensors when the API supplies
-       a status field.
-
-       If status is absent, keep the sensor because the
-       comparison page can still work with older API data.
-    */
 
     const activeSensors =
-        sensors.filter(sensor => {
-
-            const status =
-                String(
-                    sensor?.status ?? ""
-                )
-                .toLowerCase()
-                .trim();
-
-
-            if(!status){
-
-                return true;
-
-            }
-
-
-            return (
-                status === "online" ||
-                status === "alerting"
-            );
-
-        });
+        sensors.filter(
+            isSensorActive
+        );
 
 
     /*
-       Match the selected room list using the robust
-       room-name matcher above.
+       Match only the 10 requested SSC sensors
+       (or the 14 requested ESC sensors).
     */
 
     const selectedSensors =
@@ -1851,8 +1871,8 @@ function calculateSelectedCampusAverage(
 
 
     /*
-       Only sensors with a valid numerical AQI
-       are included in the average.
+       Only sensors with a numerical AQI reading
+       participate in the average.
     */
 
     const validSensors =
@@ -1865,54 +1885,36 @@ function calculateSelectedCampusAverage(
 
     /*
        Diagnostics.
-
-       These appear in the browser console and are useful
-       if a Meraki name ever changes again.
     */
 
     console.log(
         `========== ${campus} ==========`
     );
 
-
     console.log(
-        "All API sensor names:",
-        sensors.map(
-            sensor => ({
-                name: sensor.name,
-                network: sensor.network,
-                status: sensor.status,
-                aqi: getAQIValue(sensor)
-            })
-        )
-    );
-
-
-    console.log(
-        "Requested room names:",
+        "Requested sensors:",
         selectedSensorNames
     );
 
+    console.log(
+        "API sensors:",
+        sensors.map(
+            sensor => ({
+                name: sensor.name,
+                status: sensor.status,
+                iaq: sensor.iaq,
+                network: sensor.network
+            })
+        )
+    );
 
     console.log(
         "Matched sensors:",
         selectedSensors.map(
             sensor => ({
                 name: sensor.name,
-                network: sensor.network,
                 status: sensor.status,
-                aqi: getAQIValue(sensor)
-            })
-        )
-    );
-
-
-    console.log(
-        "Sensors used in average:",
-        validSensors.map(
-            sensor => ({
-                name: sensor.name,
-                aqi: getAQIValue(sensor)
+                iaq: sensor.iaq
             })
         )
     );
@@ -1940,8 +1942,10 @@ function calculateSelectedCampusAverage(
 
             (sum,sensor) => {
 
-                return sum +
-                    getAQIValue(sensor);
+                return (
+                    sum +
+                    getAQIValue(sensor)
+                );
 
             },
 
