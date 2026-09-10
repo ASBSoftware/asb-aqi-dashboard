@@ -206,7 +206,7 @@ body{
 
     width:100%;
 
-    max-width:1100px;
+    max-width:1200px;
 
     margin:0 auto;
 
@@ -248,7 +248,7 @@ body{
 
     display:grid;
 
-    grid-template-columns:1fr 1fr;
+    grid-template-columns:repeat(3,1fr);
 
     gap:20px;
 }
@@ -295,6 +295,17 @@ body{
             #238f3b,
             #16752d
         );
+}
+
+/*
+   Outdoor card background is set dynamically from
+   the current American AQI category.
+*/
+.aqi-card.outdoor{
+
+    transition:
+        background .5s ease,
+        box-shadow .5s ease;
 }
 
 
@@ -1271,6 +1282,12 @@ const SSC_AQI_SENSORS = [
 
 ];
 
+/* =====================================================
+   OUTDOOR SENSOR
+===================================================== */
+
+const OUTDOOR_SENSOR_NAME = "Outdoor";
+
 
 /* =====================================================
    ALLOWED USERS
@@ -2134,13 +2151,122 @@ function setGauge(
 
 
 /* =====================================================
+   FIND OUTDOOR SENSOR
+===================================================== */
+
+function findOutdoorSensor(sensors){
+
+    return sensors.find(sensor => {
+
+        return (
+            isSensorActive(sensor) &&
+            normalizeText(sensor?.name) ===
+            normalizeText(OUTDOOR_SENSOR_NAME)
+        );
+
+    }) || null;
+
+}
+
+
+/* =====================================================
+   OUTDOOR AQI CARD COLOR
+===================================================== */
+
+function getAQICardBackground(aqi){
+
+    if(aqi === null){
+
+        return `
+            linear-gradient(
+                135deg,
+                #64748b,
+                #475569
+            )
+        `;
+
+    }
+
+    if(aqi <= 50){
+
+        return `
+            linear-gradient(
+                135deg,
+                #35a64a,
+                #218838
+            )
+        `;
+
+    }
+
+    if(aqi <= 100){
+
+        return `
+            linear-gradient(
+                135deg,
+                #d9a900,
+                #b88900
+            )
+        `;
+
+    }
+
+    if(aqi <= 150){
+
+        return `
+            linear-gradient(
+                135deg,
+                #f28c28,
+                #d96f0b
+            )
+        `;
+
+    }
+
+    if(aqi <= 200){
+
+        return `
+            linear-gradient(
+                135deg,
+                #e3262e,
+                #bd1f26
+            )
+        `;
+
+    }
+
+    if(aqi <= 300){
+
+        return `
+            linear-gradient(
+                135deg,
+                #8e44ad,
+                #6f2f8e
+            )
+        `;
+
+    }
+
+    return `
+        linear-gradient(
+            135deg,
+            #7e0023,
+            #570019
+        )
+    `;
+
+}
+
+
+/* =====================================================
    CREATE CAMPUS CARD
 ===================================================== */
 
 function createCampusCard(
     title,
     result,
-    type
+    type,
+    tag = "INDOOR"
 ){
 
     const card =
@@ -2155,6 +2281,21 @@ function createCampusCard(
 
     const average =
         result.average;
+
+
+    /*
+       Outdoor card changes colour automatically
+       according to the American AQI category.
+    */
+
+    if(type === "outdoor"){
+
+        card.style.background =
+            getAQICardBackground(
+                average
+            );
+
+    }
 
 
     const status =
@@ -2180,7 +2321,7 @@ function createCampusCard(
 
             <div class="card-tag">
 
-                INDOOR
+                ${tag}
 
             </div>
 
@@ -2335,6 +2476,25 @@ function createSensorDetails(
 
 
     return card;
+
+}
+
+
+/* =====================================================
+   OUTDOOR INFO LABEL
+===================================================== */
+
+let currentOutdoorAQI = null;
+
+function outdoorSensorLabelForInfo(){
+
+    if(currentOutdoorAQI === null){
+
+        return "No valid AQI";
+
+    }
+
+    return `AQI ${currentOutdoorAQI}`;
 
 }
 
@@ -2573,6 +2733,63 @@ async function loadAQIData(){
             );
 
 
+        /*
+           OUTDOOR
+
+           This is a single Meraki sensor named
+           exactly "Outdoor". It is not included in
+           either indoor campus average.
+        */
+
+        const outdoorSensor =
+            findOutdoorSensor(
+                sensors
+            );
+
+
+        const outdoor = {
+
+            average:
+                outdoorSensor
+                    ? getAQIValue(
+                        outdoorSensor
+                    )
+                    : null,
+
+            sensors:
+                outdoorSensor &&
+                getAQIValue(
+                    outdoorSensor
+                ) !== null
+                    ? [outdoorSensor]
+                    : [],
+
+            matchedSensors:
+                outdoorSensor
+                    ? [outdoorSensor]
+                    : [],
+
+            expected:1
+
+        };
+
+
+        currentOutdoorAQI =
+            outdoor.average;
+
+
+        console.log(
+            "OUTDOOR AQI:",
+            outdoor.average
+        );
+
+
+        console.log(
+            "OUTDOOR SENSOR:",
+            outdoorSensor
+        );
+
+
         console.log(
             "ESC AVERAGE:",
             esc.average
@@ -2600,7 +2817,9 @@ async function loadAQIData(){
 
                 esc,
 
-                "esc"
+                "esc",
+
+                "INDOOR"
 
             )
 
@@ -2615,7 +2834,26 @@ async function loadAQIData(){
 
                 ssc,
 
-                "ssc"
+                "ssc",
+
+                "INDOOR"
+
+            )
+
+        );
+
+
+        campusGrid.appendChild(
+
+            createCampusCard(
+
+                "Outdoor Air Quality",
+
+                outdoor,
+
+                "outdoor",
+
+                "OUTDOOR"
 
             )
 
