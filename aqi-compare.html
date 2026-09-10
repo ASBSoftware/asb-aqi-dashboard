@@ -1639,6 +1639,149 @@ async function fetchSensors(){
    CALCULATE SELECTED CAMPUS AVERAGE
 ===================================================== */
 
+function getSelectedRoomKey(name){
+
+    const value =
+        normalizeText(name);
+
+
+    /*
+       Room numbers are unique identifiers for the
+       SSC rooms we selected.
+    */
+
+    const roomNumberMatch =
+        value.match(
+            /(^|\s)(201|301|302|401|402)(\s|$)/
+        );
+
+
+    if(roomNumberMatch){
+
+        return roomNumberMatch[2];
+
+    }
+
+
+    if(
+        value.includes("band room")
+    ){
+
+        return "band room";
+
+    }
+
+
+    if(
+        value.includes("choir room")
+    ){
+
+        return "choir room";
+
+    }
+
+
+    if(
+        value.includes("1st floor mph")
+    ){
+
+        return "1st floor mph";
+
+    }
+
+
+    /*
+       G17 and G3 are normalized so:
+       G-17 -> g17
+       G 17 -> g 17
+       G-3  -> g 3
+       G3   -> g3
+    */
+
+    if(
+        /\bg\s*17\b/.test(value) ||
+        value.includes("g17")
+    ){
+
+        return "g17";
+
+    }
+
+
+    if(
+        /\bg\s*3\b/.test(value) ||
+        value.includes("g3")
+    ){
+
+        return "g3";
+
+    }
+
+
+    return null;
+
+}
+
+
+function sensorMatchesSelectedRoom(
+    sensorName,
+    targetName
+){
+
+    const target =
+        normalizeText(targetName);
+
+
+    const sensor =
+        normalizeText(sensorName);
+
+
+    /*
+       First try exact normalized matching.
+    */
+
+    if(
+        sensor === target
+    ){
+
+        return true;
+
+    }
+
+
+    /*
+       Then use the stable room key.
+       This handles names such as:
+
+       "Secondary Campus - BKC - 4th floor 401"
+       "4th floor- 401"
+       "3rd floor Band Room - BKC"
+       etc.
+    */
+
+    const targetKey =
+        getSelectedRoomKey(target);
+
+
+    if(!targetKey){
+
+        return false;
+
+    }
+
+
+    const sensorKey =
+        getSelectedRoomKey(sensor);
+
+
+    return (
+        sensorKey !== null &&
+        sensorKey === targetKey
+    );
+
+}
+
+
 function calculateSelectedCampusAverage(
     sensors,
     campus,
@@ -1646,29 +1789,20 @@ function calculateSelectedCampusAverage(
 ){
 
     /*
-       The selected room list is the source of truth for this
-       comparison page.
+       The selected room list is the source of truth.
 
-       We intentionally do NOT require sensor.network to equal
-       the campus name because Meraki network names can differ
-       from the campus labels used by the dashboard.
+       We do NOT depend on sensor.network here.
+       This is important because the network name returned
+       by Meraki does not have to match our campus label.
     */
-
-    const selectedNames =
-        selectedSensorNames.map(
-            normalizeText
-        );
 
 
     /*
-       Defensive status filtering.
+       Keep only active sensors when the API supplies
+       a status field.
 
-       The Render API should already remove offline/dormant
-       sensors. This second check makes the comparison page
-       safe as well if an API response contains a status field.
-
-       If status is missing, we keep the sensor because older
-       API responses may not have included it.
+       If status is absent, keep the sensor because the
+       comparison page can still work with older API data.
     */
 
     const activeSensors =
@@ -1698,27 +1832,26 @@ function calculateSelectedCampusAverage(
 
 
     /*
-       Match ONLY the selected room names.
+       Match the selected room list using the robust
+       room-name matcher above.
     */
 
     const selectedSensors =
         activeSensors.filter(sensor => {
 
-            const sensorName =
-                normalizeText(
-                    sensor.name
-                );
-
-
-            return selectedNames.includes(
-                sensorName
+            return selectedSensorNames.some(
+                targetName =>
+                    sensorMatchesSelectedRoom(
+                        sensor.name,
+                        targetName
+                    )
             );
 
         });
 
 
     /*
-       Only sensors with a real numerical AQI
+       Only sensors with a valid numerical AQI
        are included in the average.
     */
 
@@ -1731,8 +1864,10 @@ function calculateSelectedCampusAverage(
 
 
     /*
-       Console diagnostics make it easy to see exactly
-       what Meraki/Render returned and what was matched.
+       Diagnostics.
+
+       These appear in the browser console and are useful
+       if a Meraki name ever changes again.
     */
 
     console.log(
@@ -1741,13 +1876,26 @@ function calculateSelectedCampusAverage(
 
 
     console.log(
-        "Requested sensors:",
+        "All API sensor names:",
+        sensors.map(
+            sensor => ({
+                name: sensor.name,
+                network: sensor.network,
+                status: sensor.status,
+                aqi: getAQIValue(sensor)
+            })
+        )
+    );
+
+
+    console.log(
+        "Requested room names:",
         selectedSensorNames
     );
 
 
     console.log(
-        "Matched active sensors:",
+        "Matched sensors:",
         selectedSensors.map(
             sensor => ({
                 name: sensor.name,
@@ -1764,16 +1912,11 @@ function calculateSelectedCampusAverage(
         validSensors.map(
             sensor => ({
                 name: sensor.name,
-                status: sensor.status,
                 aqi: getAQIValue(sensor)
             })
         )
     );
 
-
-    /*
-       No valid readings.
-    */
 
     if(!validSensors.length){
 
@@ -1792,10 +1935,6 @@ function calculateSelectedCampusAverage(
     }
 
 
-    /*
-       Calculate total AQI.
-    */
-
     const total =
         validSensors.reduce(
 
@@ -1810,11 +1949,6 @@ function calculateSelectedCampusAverage(
 
         );
 
-
-    /*
-       Calculate average from ONLY the selected,
-       active sensors with valid AQI readings.
-    */
 
     const average =
         Math.round(
