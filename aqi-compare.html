@@ -1249,21 +1249,19 @@ const ESC_AQI_SENSORS = [
 
 const SSC_AQI_SENSORS = [
 
-    "4th floor 401",
-
-    "4th floor 402",
+    "2nd floor 201",
 
     "3rd floor 301",
 
     "3rd floor 302",
 
+    "4th floor 401",
+
+    "4th floor 402",
+
     "3rd floor Band room",
 
     "3rd floor choir room",
-
-    "2nd floor 201",
-
-    "upper icommons",
 
     "1st floor mph",
 
@@ -1294,7 +1292,7 @@ const allowedUsers = [
     "dhatrakr@asbindia.org",
     "mhapankara@asbindia.org",
     "sabler@asbindia.org",
-    "kaleS@asbindia.org",
+    "kales@asbindia.org",
     "shethiar@asbindia.org"
 
 ];
@@ -1648,7 +1646,12 @@ function calculateSelectedCampusAverage(
 ){
 
     /*
-       Normalize selected names.
+       The selected room list is the source of truth for this
+       comparison page.
+
+       We intentionally do NOT require sensor.network to equal
+       the campus name because Meraki network names can differ
+       from the campus labels used by the dashboard.
     */
 
     const selectedNames =
@@ -1658,32 +1661,48 @@ function calculateSelectedCampusAverage(
 
 
     /*
-       We first prefer the campus value.
+       Defensive status filtering.
 
-       This prevents a sensor with the same
-       name from another campus being used.
+       The Render API should already remove offline/dormant
+       sensors. This second check makes the comparison page
+       safe as well if an API response contains a status field.
+
+       If status is missing, we keep the sensor because older
+       API responses may not have included it.
     */
 
-    const campusSensors =
+    const activeSensors =
         sensors.filter(sensor => {
 
-            return normalizeText(
-                sensor.network
-            )
-            ===
-            normalizeText(
-                campus
+            const status =
+                String(
+                    sensor?.status ?? ""
+                )
+                .toLowerCase()
+                .trim();
+
+
+            if(!status){
+
+                return true;
+
+            }
+
+
+            return (
+                status === "online" ||
+                status === "alerting"
             );
 
         });
 
 
     /*
-       Match only the selected room names.
+       Match ONLY the selected room names.
     */
 
     const selectedSensors =
-        campusSensors.filter(sensor => {
+        activeSensors.filter(sensor => {
 
             const sensorName =
                 normalizeText(
@@ -1699,8 +1718,8 @@ function calculateSelectedCampusAverage(
 
 
     /*
-       Only sensors with actual numerical
-       AQI values are included.
+       Only sensors with a real numerical AQI
+       are included in the average.
     */
 
     const validSensors =
@@ -1712,10 +1731,8 @@ function calculateSelectedCampusAverage(
 
 
     /*
-       Debug information.
-
-       Open Chrome:
-       View → Developer → Developer Tools → Console
+       Console diagnostics make it easy to see exactly
+       what Meraki/Render returned and what was matched.
     */
 
     console.log(
@@ -1724,36 +1741,38 @@ function calculateSelectedCampusAverage(
 
 
     console.log(
-        "Campus sensors:",
-        campusSensors
+        "Requested sensors:",
+        selectedSensorNames
     );
 
 
     console.log(
-        "Selected sensors:",
+        "Matched active sensors:",
         selectedSensors.map(
             sensor => ({
-                name:sensor.name,
-                network:sensor.network,
-                aqi:getAQIValue(sensor)
+                name: sensor.name,
+                network: sensor.network,
+                status: sensor.status,
+                aqi: getAQIValue(sensor)
             })
         )
     );
 
 
     console.log(
-        "Valid sensors used:",
+        "Sensors used in average:",
         validSensors.map(
             sensor => ({
-                name:sensor.name,
-                aqi:getAQIValue(sensor)
+                name: sensor.name,
+                status: sensor.status,
+                aqi: getAQIValue(sensor)
             })
         )
     );
 
 
     /*
-       No data.
+       No valid readings.
     */
 
     if(!validSensors.length){
@@ -1774,7 +1793,7 @@ function calculateSelectedCampusAverage(
 
 
     /*
-       Calculate total.
+       Calculate total AQI.
     */
 
     const total =
@@ -1793,12 +1812,8 @@ function calculateSelectedCampusAverage(
 
 
     /*
-       Calculate average.
-
-       IMPORTANT:
-
-       We use only the valid selected
-       sensors here.
+       Calculate average from ONLY the selected,
+       active sensors with valid AQI readings.
     */
 
     const average =
