@@ -1719,9 +1719,7 @@ function getSelectedRoomKey(name){
     */
 
     if(
-        value === "mph" ||
-        value.endsWith(" mph") ||
-        value.includes(" mph ")
+        value === "mph"
     ){
 
         return "mph";
@@ -1795,6 +1793,23 @@ function sensorMatchesSelectedRoom(
 
 
     if(!targetKey){
+
+        return false;
+
+    }
+
+
+    /*
+       IMPORTANT:
+       SSC uses the Meraki sensor named exactly "MPH".
+       ESC has separate sensors named "4th Floor MPH"
+       and "6th Floor MPH".
+
+       Therefore an MPH key must NOT be allowed to
+       match every floor-specific MPH sensor.
+    */
+
+    if(targetKey === "mph"){
 
         return false;
 
