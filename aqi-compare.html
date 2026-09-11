@@ -412,10 +412,9 @@ body{
 
     stroke-linecap:round;
 
-    transform-origin:125px 125px;
-
     transition:
-        transform .8s ease;
+        x2 .8s ease,
+        y2 .8s ease;
 }
 
 
@@ -678,18 +677,18 @@ body{
             to right,
 
             #e3262e 0%,
-            #e3262e 25%,
+            #e3262e 24.6914%,
 
-            #f28c28 25%,
-            #f28c28 50%,
+            #f28c28 24.6914%,
+            #f28c28 49.3827%,
 
-            #f9c23c 50%,
-            #f9c23c 75%,
+            #f9c23c 49.3827%,
+            #f9c23c 74.0741%,
 
-            #35a64a 75%,
-            #35a64a 91.25%,
+            #35a64a 74.0741%,
+            #35a64a 90.1235%,
 
-            #218838 91.25%,
+            #218838 90.1235%,
             #218838 100%
         );
 }
@@ -700,7 +699,7 @@ body{
     display:grid;
 
     grid-template-columns:
-        25% 25% 25% 16.25% 8.75%;
+        24.6914% 24.6914% 24.6914% 16.0494% 9.8765%;
 
     margin-top:8px;
 
@@ -2060,14 +2059,14 @@ function createGauge(){
                 class="gauge-needle"
                 x1="125"
                 y1="125"
-                x2="205"
+                x2="45"
                 y2="125"
             ></line>
 
 
             <circle
                 class="gauge-needle-dot"
-                cx="205"
+                cx="45"
                 cy="125"
                 r="5"
             ></circle>
@@ -2107,6 +2106,7 @@ function setGauge(
             ".gauge-needle"
         );
 
+
     const needleDot =
         card.querySelector(
             ".gauge-needle-dot"
@@ -2120,29 +2120,98 @@ function setGauge(
     }
 
 
-    const pathLength = 283;
+    /*
+       The gauge is a 180° semicircle.
+
+       IAQ 0   = left
+       IAQ 50  = top
+       IAQ 100 = right
+
+       We position the needle by changing its SVG
+       endpoint directly. This avoids browser-specific
+       CSS transform behaviour on SVG elements.
+    */
+
+    const value =
+        iaq === null
+            ? 0
+            : Math.max(
+                0,
+                Math.min(
+                    100,
+                    Number(iaq)
+                )
+            );
+
+
+    const angle =
+        Math.PI -
+        (
+            value /
+            100
+        ) * Math.PI;
+
+
+    const needleLength = 80;
+
+
+    const x2 =
+        125 +
+        (
+            needleLength *
+            Math.cos(angle)
+        );
+
+
+    const y2 =
+        125 -
+        (
+            needleLength *
+            Math.sin(angle)
+        );
+
+
+    needle.setAttribute(
+        "x2",
+        x2.toFixed(2)
+    );
+
+
+    needle.setAttribute(
+        "y2",
+        y2.toFixed(2)
+    );
+
+
+    if(needleDot){
+
+        needleDot.setAttribute(
+            "cx",
+            x2.toFixed(2)
+        );
+
+
+        needleDot.setAttribute(
+            "cy",
+            y2.toFixed(2)
+        );
+
+    }
+
+
+    /*
+       Match the progress arc to the same 0–100 scale.
+    */
+
+    const pathLength = 282.74;
 
 
     progress.style.strokeDasharray =
         `${pathLength}`;
 
 
-    let percentage = 0;
-
-
-    if(iaq !== null){
-
-        percentage =
-            Math.max(
-                0,
-                Math.min(
-                    1,
-                    Number(iaq) /
-                    100
-                )
-            );
-
-    }
+    const percentage =
+        value / 100;
 
 
     progress.style.strokeDashoffset =
@@ -2151,24 +2220,6 @@ function setGauge(
             pathLength *
             percentage
         );
-
-
-    const angle =
-        getGaugeAngle(iaq);
-
-
-    needle.style.transform =
-        `rotate(${angle}deg)`;
-
-    if(needleDot){
-
-        needleDot.style.transformOrigin =
-            "125px 125px";
-
-        needleDot.style.transform =
-            `rotate(${angle}deg)`;
-
-    }
 
 }
 
@@ -2677,26 +2728,38 @@ async function loadIAQData(){
 
 
     /*
-       Show loading message while
-       fetching from Render.
+       Do not clear the current cards during a refresh.
+       This prevents the dashboard from flashing/loading
+       every two minutes and keeps the last good readings
+       visible while Render responds.
     */
 
-    campusGrid.innerHTML = `
+    const hadCards =
+        campusGrid.querySelector(
+            ".aqi-card"
+        );
 
-        <div class="loading">
 
-            Connecting to IAQ sensor API...
+    if(!hadCards){
 
-            <br><br>
+        campusGrid.innerHTML = `
 
-            <small>
-                If the server was sleeping,
-                this may take a few seconds.
-            </small>
+            <div class="loading">
 
-        </div>
+                Connecting to IAQ sensor API...
 
-    `;
+                <br><br>
+
+                <small>
+                    If the server was sleeping,
+                    this may take a few seconds.
+                </small>
+
+            </div>
+
+        `;
+
+    }
 
 
     try{
@@ -2925,6 +2988,40 @@ async function loadIAQData(){
     }
     catch(error){
 
+        /*
+           On a refresh failure, keep the last successful
+           readings on screen instead of replacing the
+           dashboard with an error page.
+        */
+
+        if(
+            campusGrid.querySelector(
+                ".aqi-card"
+            )
+        ){
+
+            console.warn(
+                "IAQ refresh failed; keeping last successful readings:",
+                error
+            );
+
+
+            document.getElementById(
+                "infoTitle"
+            ).innerText =
+                "Live IAQ refresh temporarily unavailable";
+
+
+            document.getElementById(
+                "infoText"
+            ).innerText =
+                `Showing the last successful readings. The dashboard will retry automatically.`;
+
+            return;
+
+        }
+
+
         showError(error);
 
     }
@@ -3053,7 +3150,7 @@ onAuthStateChanged(
 
 
 /* =====================================================
-   REFRESH EVERY 2 MINUTES
+   REFRESH EVERY 10 MINUTES
 ===================================================== */
 
 setInterval(
@@ -3075,7 +3172,7 @@ setInterval(
 
     },
 
-    120000
+     600000
 
 );
 
