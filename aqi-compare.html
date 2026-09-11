@@ -10,7 +10,7 @@
     content="width=device-width, initial-scale=1.0"
 >
 
-<title>ASB Campus AQI</title>
+<title>ASB Campus IAQ</title>
 
 <style>
 
@@ -255,7 +255,7 @@ body{
 
 
 /* =====================================================
-   AQI CARD
+   IAQ CARD
 ===================================================== */
 
 .aqi-card{
@@ -299,7 +299,7 @@ body{
 
 /*
    Outdoor card background is set dynamically from
-   the current American AQI category.
+   the current Meraki IAQ category.
 */
 .aqi-card.outdoor{
 
@@ -462,7 +462,7 @@ body{
 
 
 /* =====================================================
-   AQI VALUE
+   IAQ VALUE
 ===================================================== */
 
 .aqi-value{
@@ -662,7 +662,7 @@ body{
 
 
 /* =====================================================
-   AMERICAN AQI SCALE
+   MERAKI IAQ SCALE
 ===================================================== */
 
 .scale{
@@ -697,23 +697,20 @@ body{
         linear-gradient(
             to right,
 
-            #35a64a 0%,
-            #35a64a 10%,
-
-            #f9c23c 10%,
-            #f9c23c 20%,
-
-            #f28c28 20%,
-            #f28c28 30%,
-
-            #e3262e 30%,
+            #e3262e 0%,
             #e3262e 40%,
 
-            #8e44ad 40%,
-            #8e44ad 60%,
+            #f28c28 40%,
+            #f28c28 60%,
 
-            #7e0023 60%,
-            #7e0023 100%
+            #f9c23c 60%,
+            #f9c23c 80%,
+
+            #35a64a 80%,
+            #35a64a 93%,
+
+            #218838 93%,
+            #218838 100%
         );
 }
 
@@ -723,7 +720,7 @@ body{
     display:grid;
 
     grid-template-columns:
-        repeat(6,1fr);
+        repeat(5,1fr);
 
     margin-top:8px;
 
@@ -963,7 +960,7 @@ body{
             </h1>
 
             <p>
-                Environmental Intelligence — Campus AQI
+                Environmental Intelligence — Campus IAQ
             </p>
 
         </div>
@@ -1006,11 +1003,11 @@ body{
     <div class="page-title">
 
         <h2>
-            Campus Air Quality
+            Campus Indoor Air Quality
         </h2>
 
         <p>
-            American School of Bombay — American AQI Scale
+            American School of Bombay — Meraki IAQ Scale
         </p>
 
     </div>
@@ -1046,7 +1043,7 @@ body{
         <div class="info-text">
 
             <strong id="infoTitle">
-                Calculating campus AQI...
+                Calculating campus IAQ...
             </strong>
 
             <span id="infoText">
@@ -1067,12 +1064,12 @@ body{
     </div>
 
 
-    <!-- AQI SCALE -->
+    <!-- IAQ SCALE -->
 
     <div class="scale">
 
         <h3>
-            American AQI Scale
+            Meraki IAQ Scale
         </h3>
 
         <div class="scale-bar"></div>
@@ -1080,34 +1077,28 @@ body{
         <div class="scale-labels">
 
             <div>
-                0–50<br>
+                20–39<br>
+                Inadequate
+            </div>
+
+            <div>
+                40–59<br>
+                Poor
+            </div>
+
+            <div>
+                60–79<br>
+                Fair
+            </div>
+
+            <div>
+                80–92<br>
                 Good
             </div>
 
             <div>
-                51–100<br>
-                Moderate
-            </div>
-
-            <div>
-                101–150<br>
-                Unhealthy<br>
-                for Sensitive
-            </div>
-
-            <div>
-                151–200<br>
-                Unhealthy
-            </div>
-
-            <div>
-                201–300<br>
-                Very Unhealthy
-            </div>
-
-            <div>
-                301–500<br>
-                Hazardous
+                93–100<br>
+                Excellent
             </div>
 
         </div>
@@ -1221,7 +1212,7 @@ const SSC_CAMPUS =
    SELECTED ESC SENSORS
 ===================================================== */
 
-const ESC_AQI_SENSORS = [
+const ESC_IAQ_SENSORS = [
 
     "Ground floor prek class",
 
@@ -1258,7 +1249,7 @@ const ESC_AQI_SENSORS = [
    SELECTED SSC SENSORS
 ===================================================== */
 
-const SSC_AQI_SENSORS = [
+const SSC_IAQ_SENSORS = [
 
     "201",
 
@@ -1343,10 +1334,10 @@ function normalizeText(value){
 
 
 /* =====================================================
-   GET AQI
+   GET IAQ
 ===================================================== */
 
-function getAQIValue(sensor){
+function getIAQValue(sensor){
 
     /*
        Normal API field:
@@ -1400,12 +1391,12 @@ function getAQIValue(sensor){
 
 
 /* =====================================================
-   AQI STATUS
+   IAQ STATUS
 ===================================================== */
 
-function getAQIStatus(aqi){
+function getIAQStatus(iaq){
 
-    if(aqi === null){
+    if(iaq === null){
 
         return {
             text:"No Data"
@@ -1414,7 +1405,16 @@ function getAQIStatus(aqi){
     }
 
 
-    if(aqi <= 50){
+    if(iaq >= 93){
+
+        return {
+            text:"Excellent"
+        };
+
+    }
+
+
+    if(iaq >= 80){
 
         return {
             text:"Good"
@@ -1423,49 +1423,29 @@ function getAQIStatus(aqi){
     }
 
 
-    if(aqi <= 100){
+    if(iaq >= 60){
 
         return {
-            text:"Moderate"
+            text:"Fair"
         };
 
     }
 
 
-    if(aqi <= 150){
+    if(iaq >= 40){
 
         return {
-            text:
-                "Unhealthy for Sensitive Groups"
-        };
-
-    }
-
-
-    if(aqi <= 200){
-
-        return {
-            text:"Unhealthy"
-        };
-
-    }
-
-
-    if(aqi <= 300){
-
-        return {
-            text:"Very Unhealthy"
+            text:"Poor"
         };
 
     }
 
 
     return {
-        text:"Hazardous"
+        text:"Inadequate"
     };
 
 }
-
 
 /* =====================================================
    FETCH SENSORS
@@ -1621,7 +1601,7 @@ async function fetchSensors(){
         ){
 
             throw new Error(
-                "The AQI API took more than 30 seconds to respond. The Render server may be waking up."
+                "The IAQ API took more than 30 seconds to respond. The Render server may be waking up."
             );
 
         }
@@ -1639,7 +1619,7 @@ async function fetchSensors(){
         ){
 
             throw new Error(
-                "The browser could not reach the AQI API. Check that the Render API is running and allows requests from this website."
+                "The browser could not reach the IAQ API. Check that the Render API is running and allows requests from this website."
             );
 
         }
@@ -1903,14 +1883,14 @@ function calculateSelectedCampusAverage(
 
 
     /*
-       Only sensors with a numerical AQI reading
+       Only sensors with a numerical IAQ reading
        participate in the average.
     */
 
     const validSensors =
         selectedSensors.filter(sensor => {
 
-            return getAQIValue(sensor) !== null;
+            return getIAQValue(sensor) !== null;
 
         });
 
@@ -1976,7 +1956,7 @@ function calculateSelectedCampusAverage(
 
                 return (
                     sum +
-                    getAQIValue(sensor)
+                    getIAQValue(sensor)
                 );
 
             },
@@ -2012,9 +1992,9 @@ function calculateSelectedCampusAverage(
    GAUGE ANGLE
 ===================================================== */
 
-function getGaugeAngle(aqi){
+function getGaugeAngle(iaq){
 
-    if(aqi === null){
+    if(iaq === null){
 
         return -90;
 
@@ -2025,8 +2005,8 @@ function getGaugeAngle(aqi){
         Math.max(
             0,
             Math.min(
-                500,
-                Number(aqi)
+                100,
+                Number(iaq)
             )
         );
 
@@ -2035,13 +2015,12 @@ function getGaugeAngle(aqi){
         -90 +
         (
             value /
-            500
+            100
         ) *
         180
     );
 
 }
-
 
 /* =====================================================
    CREATE GAUGE
@@ -2100,7 +2079,7 @@ function createGauge(){
 
 function setGauge(
     card,
-    aqi
+    iaq
 ){
 
     const progress =
@@ -2132,15 +2111,15 @@ function setGauge(
     let percentage = 0;
 
 
-    if(aqi !== null){
+    if(iaq !== null){
 
         percentage =
             Math.max(
                 0,
                 Math.min(
                     1,
-                    Number(aqi) /
-                    500
+                    Number(iaq) /
+                    100
                 )
             );
 
@@ -2156,7 +2135,7 @@ function setGauge(
 
 
     const angle =
-        getGaugeAngle(aqi);
+        getGaugeAngle(iaq);
 
 
     needle.style.transform =
@@ -2185,12 +2164,12 @@ function findOutdoorSensor(sensors){
 
 
 /* =====================================================
-   OUTDOOR AQI CARD COLOR
+   OUTDOOR IAQ CARD COLOR
 ===================================================== */
 
-function getAQICardBackground(aqi){
+function getIAQCardBackground(iaq){
 
-    if(aqi === null){
+    if(iaq === null){
 
         return `
             linear-gradient(
@@ -2202,7 +2181,19 @@ function getAQICardBackground(aqi){
 
     }
 
-    if(aqi <= 50){
+    if(iaq >= 93){
+
+        return `
+            linear-gradient(
+                135deg,
+                #218838,
+                #176b2b
+            )
+        `;
+
+    }
+
+    if(iaq >= 80){
 
         return `
             linear-gradient(
@@ -2214,7 +2205,7 @@ function getAQICardBackground(aqi){
 
     }
 
-    if(aqi <= 100){
+    if(iaq >= 60){
 
         return `
             linear-gradient(
@@ -2226,7 +2217,7 @@ function getAQICardBackground(aqi){
 
     }
 
-    if(aqi <= 150){
+    if(iaq >= 40){
 
         return `
             linear-gradient(
@@ -2238,40 +2229,15 @@ function getAQICardBackground(aqi){
 
     }
 
-    if(aqi <= 200){
-
-        return `
-            linear-gradient(
-                135deg,
-                #e3262e,
-                #bd1f26
-            )
-        `;
-
-    }
-
-    if(aqi <= 300){
-
-        return `
-            linear-gradient(
-                135deg,
-                #8e44ad,
-                #6f2f8e
-            )
-        `;
-
-    }
-
     return `
         linear-gradient(
             135deg,
-            #7e0023,
-            #570019
+            #e3262e,
+            #bd1f26
         )
     `;
 
 }
-
 
 /* =====================================================
    CREATE CAMPUS CARD
@@ -2300,13 +2266,13 @@ function createCampusCard(
 
     /*
        Outdoor card changes colour automatically
-       according to the American AQI category.
+       according to the Meraki IAQ category.
     */
 
     if(type === "outdoor"){
 
         card.style.background =
-            getAQICardBackground(
+            getIAQCardBackground(
                 average
             );
 
@@ -2314,7 +2280,7 @@ function createCampusCard(
 
 
     const status =
-        getAQIStatus(
+        getIAQStatus(
             average
         );
 
@@ -2357,7 +2323,7 @@ function createCampusCard(
 
         <div class="aqi-label">
 
-            AQI
+            IAQ Score
 
         </div>
 
@@ -2431,8 +2397,8 @@ function createSensorDetails(
             (a,b) => {
 
                 return (
-                    getAQIValue(a) -
-                    getAQIValue(b)
+                    getIAQValue(a) -
+                    getIAQValue(b)
                 );
 
             }
@@ -2451,7 +2417,7 @@ function createSensorDetails(
 
                     <span class="room-value">
 
-                        ${getAQIValue(sensor)}
+                        ${getIAQValue(sensor)}
 
                     </span>
 
@@ -2499,17 +2465,17 @@ function createSensorDetails(
    OUTDOOR INFO LABEL
 ===================================================== */
 
-let currentOutdoorAQI = null;
+let currentOutdoorIAQ = null;
 
 function outdoorSensorLabelForInfo(){
 
-    if(currentOutdoorAQI === null){
+    if(currentOutdoorIAQ === null){
 
-        return "No valid AQI";
+        return "No valid IAQ";
 
     }
 
-    return `AQI ${currentOutdoorAQI}`;
+    return `IAQ ${currentOutdoorIAQ}`;
 
 }
 
@@ -2540,13 +2506,13 @@ function updateInfo(
         document.getElementById(
             "infoTitle"
         ).innerText =
-            "No selected campus AQI data";
+            "No selected campus IAQ data";
 
 
         document.getElementById(
             "infoText"
         ).innerText =
-            "The API is responding, but none of the selected sensors currently has a valid AQI reading.";
+            "The API is responding, but none of the selected sensors currently has a valid IAQ reading.";
 
         return;
 
@@ -2571,7 +2537,7 @@ function updateInfo(
     document.getElementById(
         "infoTitle"
     ).innerText =
-        `Indoor campus average AQI is ${overall}`;
+        `Indoor campus average IAQ is ${overall}`;
 
 
     document.getElementById(
@@ -2589,7 +2555,7 @@ function updateInfo(
 function showError(error){
 
     console.error(
-        "AQI API ERROR:",
+        "IAQ API ERROR:",
         error
     );
 
@@ -2607,7 +2573,7 @@ function showError(error){
 
             <div class="error-title">
 
-                Unable to load AQI data
+                Unable to load IAQ data
 
             </div>
 
@@ -2644,7 +2610,7 @@ function showError(error){
     document.getElementById(
         "infoTitle"
     ).innerText =
-        "AQI data unavailable";
+        "IAQ data unavailable";
 
 
     document.getElementById(
@@ -2662,7 +2628,7 @@ function showError(error){
     if(retryButton){
 
         retryButton.onclick =
-            loadAQIData;
+            loadIAQData;
 
     }
 
@@ -2670,10 +2636,10 @@ function showError(error){
 
 
 /* =====================================================
-   LOAD AQI DATA
+   LOAD IAQ DATA
 ===================================================== */
 
-async function loadAQIData(){
+async function loadIAQData(){
 
     const campusGrid =
         document.getElementById(
@@ -2690,7 +2656,7 @@ async function loadAQIData(){
 
         <div class="loading">
 
-            Connecting to AQI sensor API...
+            Connecting to IAQ sensor API...
 
             <br><br>
 
@@ -2727,7 +2693,7 @@ async function loadAQIData(){
 
                 ESC_CAMPUS,
 
-                ESC_AQI_SENSORS
+                ESC_IAQ_SENSORS
 
             );
 
@@ -2743,7 +2709,7 @@ async function loadAQIData(){
 
                 SSC_CAMPUS,
 
-                SSC_AQI_SENSORS
+                SSC_IAQ_SENSORS
 
             );
 
@@ -2766,14 +2732,14 @@ async function loadAQIData(){
 
             average:
                 outdoorSensor
-                    ? getAQIValue(
+                    ? getIAQValue(
                         outdoorSensor
                     )
                     : null,
 
             sensors:
                 outdoorSensor &&
-                getAQIValue(
+                getIAQValue(
                     outdoorSensor
                 ) !== null
                     ? [outdoorSensor]
@@ -2789,12 +2755,12 @@ async function loadAQIData(){
         };
 
 
-        currentOutdoorAQI =
+        currentOutdoorIAQ =
             outdoor.average;
 
 
         console.log(
-            "OUTDOOR AQI:",
+            "OUTDOOR IAQ:",
             outdoor.average
         );
 
@@ -2862,7 +2828,7 @@ async function loadAQIData(){
 
             createCampusCard(
 
-                "Outdoor Air Quality",
+                "Outdoor IAQ",
 
                 outdoor,
 
@@ -2982,7 +2948,7 @@ onAuthStateChanged(
 
         ){
 
-            loadAQIData();
+            loadIAQData();
 
         }
 
@@ -3058,7 +3024,7 @@ onAuthStateChanged(
 
 
 /* =====================================================
-   REFRESH EVERY 30 SECONDS
+   REFRESH EVERY 2 MINUTES
 ===================================================== */
 
 setInterval(
@@ -3074,7 +3040,7 @@ setInterval(
             auth.currentUser
         ){
 
-            loadAQIData();
+            loadIAQData();
 
         }
 
