@@ -358,6 +358,12 @@ body{
     margin:20px auto 0;
 
     position:relative;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
 }
 
 
@@ -400,64 +406,28 @@ body{
 
 .gauge-needle{
 
-    position:absolute;
+    stroke:white;
 
-    width:95px;
+    stroke-width:3.5;
 
-    height:3px;
+    stroke-linecap:round;
 
-    background:white;
-
-    left:50%;
-
-    top:125px;
-
-    transform-origin:0 50%;
+    transform-origin:125px 125px;
 
     transition:
         transform .8s ease;
-
-    border-radius:5px;
 }
 
 
-.gauge-needle::after{
+.gauge-needle-dot{
 
-    content:"";
-
-    position:absolute;
-
-    right:-5px;
-
-    top:-4px;
-
-    width:10px;
-
-    height:10px;
-
-    background:white;
-
-    border-radius:50%;
+    fill:white;
 }
 
 
 .gauge-center{
 
-    position:absolute;
-
-    left:50%;
-
-    top:120px;
-
-    width:10px;
-
-    height:10px;
-
-    background:white;
-
-    border-radius:50%;
-
-    transform:translateX(-50%);
+    fill:white;
 }
 
 
@@ -681,7 +651,17 @@ body{
 
 .scale h3{
 
-    font-size:15px;
+    font-size:17px;
+
+    margin-bottom:5px;
+}
+
+
+.scale-subtitle{
+
+    color:var(--muted);
+
+    font-size:12px;
 
     margin-bottom:15px;
 }
@@ -698,18 +678,18 @@ body{
             to right,
 
             #e3262e 0%,
-            #e3262e 40%,
+            #e3262e 25%,
 
-            #f28c28 40%,
-            #f28c28 60%,
+            #f28c28 25%,
+            #f28c28 50%,
 
-            #f9c23c 60%,
-            #f9c23c 80%,
+            #f9c23c 50%,
+            #f9c23c 75%,
 
-            #35a64a 80%,
-            #35a64a 93%,
+            #35a64a 75%,
+            #35a64a 91.25%,
 
-            #218838 93%,
+            #218838 91.25%,
             #218838 100%
         );
 }
@@ -720,7 +700,7 @@ body{
     display:grid;
 
     grid-template-columns:
-        repeat(5,1fr);
+        25% 25% 25% 16.25% 8.75%;
 
     margin-top:8px;
 
@@ -1013,6 +993,57 @@ body{
     </div>
 
 
+    <!-- IAQ SCALE — SHOWN BEFORE THE CAMPUS COMPARISON -->
+
+    <!-- IAQ SCALE -->
+
+    <div class="scale">
+
+        <h3>
+            Meraki IAQ Scale
+        </h3>
+
+        <p class="scale-subtitle">
+            Higher scores indicate better indoor air quality.
+        </p>
+
+        <div class="scale-bar"></div>
+
+        <div class="scale-labels">
+
+            <div>
+                20–39<br>
+                Inadequate
+            </div>
+
+            <div>
+                40–59<br>
+                Poor
+            </div>
+
+            <div>
+                60–79<br>
+                Fair
+            </div>
+
+            <div>
+                80–92<br>
+                Good
+            </div>
+
+            <div>
+                93–100<br>
+                Excellent
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+
+
     <!-- CAMPUS CARDS -->
 
     <div
@@ -1061,48 +1092,6 @@ body{
         class="details-grid"
         id="detailsGrid"
     >
-    </div>
-
-
-    <!-- IAQ SCALE -->
-
-    <div class="scale">
-
-        <h3>
-            Meraki IAQ Scale
-        </h3>
-
-        <div class="scale-bar"></div>
-
-        <div class="scale-labels">
-
-            <div>
-                20–39<br>
-                Inadequate
-            </div>
-
-            <div>
-                40–59<br>
-                Poor
-            </div>
-
-            <div>
-                60–79<br>
-                Fair
-            </div>
-
-            <div>
-                80–92<br>
-                Good
-            </div>
-
-            <div>
-                93–100<br>
-                Excellent
-            </div>
-
-        </div>
-
     </div>
 
 
@@ -2011,8 +2000,18 @@ function getGaugeAngle(iaq){
         );
 
 
+    /*
+       SVG gauge coordinates:
+       0 IAQ   = far left
+       50 IAQ  = straight up
+       100 IAQ = far right
+
+       CSS/SVG positive rotation is clockwise,
+       so the needle starts pointing left (180°).
+    */
+
     return (
-        -90 +
+        180 +
         (
             value /
             100
@@ -2057,14 +2056,29 @@ function createGauge(){
             </svg>
 
 
-            <div
+            <line
                 class="gauge-needle"
-            ></div>
+                x1="125"
+                y1="125"
+                x2="205"
+                y2="125"
+            ></line>
 
 
-            <div
+            <circle
+                class="gauge-needle-dot"
+                cx="205"
+                cy="125"
+                r="5"
+            ></circle>
+
+
+            <circle
                 class="gauge-center"
-            ></div>
+                cx="125"
+                cy="125"
+                r="5"
+            ></circle>
 
         </div>
 
@@ -2091,6 +2105,11 @@ function setGauge(
     const needle =
         card.querySelector(
             ".gauge-needle"
+        );
+
+    const needleDot =
+        card.querySelector(
+            ".gauge-needle-dot"
         );
 
 
@@ -2140,6 +2159,16 @@ function setGauge(
 
     needle.style.transform =
         `rotate(${angle}deg)`;
+
+    if(needleDot){
+
+        needleDot.style.transformOrigin =
+            "125px 125px";
+
+        needleDot.style.transform =
+            `rotate(${angle}deg)`;
+
+    }
 
 }
 
